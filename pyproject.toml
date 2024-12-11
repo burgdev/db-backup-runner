@@ -1,0 +1,49 @@
+[project]
+name = "db-backup-runner"
+version = "0.1.0"
+description = "Run any db backups (and others) from inside its own docker container"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "click>=8.1.7",
+  "docker>=7.1.0",
+  "loguru>=0.7.3",
+  "python-cron",
+  "python-dotenv>=1.0.1",
+  "requests>=2.32.3",
+  "tqdm>=4.67.1",
+]
+
+[dependency-groups]
+dev = [
+  "deptry>=0.21.1",
+  "pre-commit>=4.0.1",
+  "pyright>=1.1.390",
+  "pytest>=8.3.4",
+  "ruff>=0.8.2",
+  "types-requests>=2.32.0.20241016",
+]
+
+
+[tool.uv.sources]
+# Use an unreleased version to support non-async jobs
+# https://github.com/whdev1/pycron/pull/1
+python-cron = { git = "https://github.com/whdev1/pycron", rev = "e40f465940f1632b753b75c819364b20ed85e1ca" }
+
+[project.scripts]
+db-backup-runner = "db_backup_runner:cli"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["db_backup_runner"]
+
+[tool.deptry.per_rule_ignores]
+DEP004 = ["rich", "icecream"] # only in dev
+DEP003 = ["db_backup_runner"] # transitive dependencies
+#DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

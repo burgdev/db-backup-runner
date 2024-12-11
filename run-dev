@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+mkdir -p pgbackups
+
+make docker-build
+
+docker run  \
+    --rm \
+    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
+    --volume "./pgbackups:/var/backups" \
+    -it \
+    db-backup-runner:next-alpine \
+    "$@" &&
+  echo "Set user for 'pgbackups' to '$USER' (needs sudo)" &&
+  sudo chown -R $USER:$USER pgbackups/

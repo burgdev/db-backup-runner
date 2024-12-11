@@ -1,0 +1,64 @@
+services:
+  backup:
+    build:
+      context: .
+    restart: unless-stopped
+    command: "sleep infinity"
+    container_name: docker-db-auto-backup
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./backups:/var/backups
+      - /app/db-auto-backup.py:/usr/src/db-auto-backup/db-auto-backup.py:ro
+    depends_on:
+      - psql
+      - mariadb
+      - mysql
+      - redis
+
+  postgis:
+    image: "postgis/postgis:16-3.5-alpine"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=password
+    labels:
+      - "db-backup-runner.enable=enable"
+
+  psql:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=password
+    labels:
+      - "db-backup-runner.enable=true"
+
+  psql-2:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=password
+    labels:
+      - "db-backup-runner.enable=true"
+
+  mariadb:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=password
+    labels:
+      - "db-backup-runner.enable=true"
+        #- "db-backup-runner.backup_provider=mysql"
+
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    labels:
+      - "db-backup-runner.enable=true"
+      - "db-backup-runner.backup_provider=mysql"
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    labels:
+      - "db-backup-runner.enable=true"
