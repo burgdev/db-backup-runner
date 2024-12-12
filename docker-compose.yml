@@ -17,14 +17,17 @@ services:
 
   postgis:
     image: "postgis/postgis:16-3.5-alpine"
+    container_name: postgis
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=password
     labels:
-      - "db-backup-runner.enable=enable"
+      - "db-backup-runner.enable=true"
+      #- "db-backup-runner.dump_args=-Fc"
 
   psql:
     image: postgres:alpine
+    container_name: postgres
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=password
@@ -33,32 +36,36 @@ services:
 
   psql-2:
     image: postgres:alpine
+    container_name: postgres_2
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=password
     labels:
-      - "db-backup-runner.enable=true"
+      - "db-backup-runner.enable=false"
 
   mariadb:
     image: mariadb:latest
+    container_name: mariadb
     restart: unless-stopped
     environment:
       - MARIADB_ROOT_PASSWORD=password
     labels:
-      - "db-backup-runner.enable=true"
+      - "db-backup-runner.enable=false"
         #- "db-backup-runner.backup_provider=mysql"
 
   mysql:
     image: mysql:latest
+    container_name: mysql
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=password
     labels:
-      - "db-backup-runner.enable=true"
+      - "db-backup-runner.enable=false"
       - "db-backup-runner.backup_provider=mysql"
 
   redis:
     image: redis:alpine
+    container_name: redis
     restart: unless-stopped
     labels:
-      - "db-backup-runner.enable=true"
+      - "db-backup-runner.enable=false"

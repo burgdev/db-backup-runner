@@ -64,7 +64,7 @@ class BackupManager:
     ) -> Path:
         timestamp = f"-{self.strtimestamp}" if self.use_timestamp else ""
         name = Path(
-            f"{container.name}.{provider.name.lower()}{timestamp}{provider.plain_file_extension}{get_compressed_file_extension(self.compression)}"
+            f"{container.name}.{provider.name.lower()}{timestamp}{get_compressed_file_extension(self.compression)}"
         )
         if self.compression == "plain":
             return name.with_suffix(provider.plain_file_extension)
@@ -177,11 +177,13 @@ class BackupManager:
             )
 
             backup_command = provider.dump()
-            _, output = container.exec_run(backup_command, stream=True, demux=True)
+            logger.info(f"Run backup command: '{backup_command}'")
+            stderr, output = container.exec_run(backup_command, stream=True, demux=True)
 
             logger.info(
                 f"Backing up container '{container.name}' with '{provider.name}' backup provider:"
             )
+            stderr_messages = []
             with open_file_compressed(
                 backup_temp_file_path, self.compression
             ) as backup_temp_file:
@@ -191,10 +193,14 @@ class BackupManager:
                     desc=f"      {backup_filename}",
                     disable=not sys.stdout.isatty,
                 ) as f:
-                    for stdout, _ in output:
+                    for stdout, stderr in output:
+                        if stderr:
+                            stderr_messages += stderr.decode().strip().split("\n")
                         if stdout is None:
                             continue
                         f.write(stdout)
+            for stderr in stderr_messages:
+                logger.warning(stderr)
 
             if provider.validate_file(backup_temp_file_path):
                 os.replace(backup_temp_file_path, backup_filepath)
@@ -219,17 +225,21 @@ class BackupManager:
         )
         return fails
 
-    def restore(self, container_name: str, backup_file: Path) -> int:
-        container = self.docker_client.containers.get(container_name)
-        provider = self.get_backup_provider(container)
-        if not provider:
-            logger.error(f"No backup provider found for container {container_name}.")
-            return 0
-
-        logger.info(
-            f"Restoring backup for container {container_name} from {backup_file}."
-        )
-        provider.restore(backup_file)
+    def restore(self, target: str, restore_file: Path) -> int:
+        containers = self.get_enabled_containers()
+        for container in containers:
+            if target and target in [container.name, container.short_id, container.id]:
+                continue
+            provider = self.get_backup_provider(container)
+            if not provider:
+                logger.error(
+                    f"No backup provider found for container {container.name}."
+                )
+                return 0
+            if target and target == provider.get_service_name():
+                continue
+            provider.restore(restore_file)
+        logger.info("You can pipe the output into a file and run the script")
         return 0
 
 
