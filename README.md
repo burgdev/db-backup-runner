@@ -41,12 +41,12 @@ services:
     image: ghcr.io/burgdev/db-backup-runner:next-alpine # (~60MB)
     restart: unless-stopped
     container_name: docker-db-auto-backup
-    cmd: "--on-startup" # optional
+    command: "scheduled-backup --on-startup" # optional
     environment:
       SCHEDULE: "0 4 * * *" # https://crontab.guru
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
-      - ./backups:/var/backups # backup directory
+      - ./backups:/tmp/db_backup_runner # backup directory
 ```
 
 The backup container runs a cron job which backs up all container which are enabled and have a
@@ -78,7 +78,7 @@ All other labels are optional and usually nor needed:
 - `-c`, `--compression`, `COMPRESSION`: Compression algorithm , supported values: plain, gzip, lzma, xz, bz2
 - `-w`, `--webhook`, `WEBHOOK`: Webhook address in case of success or error.
 - `-t`, `--use-timestamp`, `USE_TIMESTAMP`: Add timestamp to filename.
-- `-b`, `--backup-dir`, `BACKUP_DIR`: Different backup directory (only used if run outside of a container).
+- `-b`, `--backup-dir`, `BACKUP_DIR`: Different backup directory (only used if run outside of a container, defaults to `/tmp/db_backup_runner`).
 - `-o`, `--on-startup`, `ON_STARTUP`: Run a backup when the container starts.
 
 ## Missing
