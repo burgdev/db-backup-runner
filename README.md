@@ -83,7 +83,7 @@ All other labels are optional and usually nor needed:
 
 ## Todos
 
-- [ ] Only upload images from the same stack
+- [x] Only upload images from the same stack
 - [ ] At the moment the `restore` function is not implemented yet.
 - [ ] Upload files into the "cloud"
 
