@@ -81,10 +81,11 @@ All other labels are optional and usually nor needed:
 - `-b`, `--backup-dir`, `BACKUP_DIR`: Different backup directory (only used if run outside of a container, defaults to `/tmp/db_backup_runner`).
 - `-o`, `--on-startup`, `ON_STARTUP`: Run a backup when the container starts.
 
-## Missing
+## Todos
 
-- At the moment the `restore` function is not implemented yet.
-- Upload files into the "cloud"
+- [ ] Only upload images from the same stack
+- [ ] At the moment the `restore` function is not implemented yet.
+- [ ] Upload files into the "cloud"
 
 # Credits
 
