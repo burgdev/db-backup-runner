@@ -8,16 +8,16 @@ class PostgresBackupProvider(BackupProviderBase):
     name = "postgres"
     default_dump_binary = "pg_dump"
     # default_dump_binary = "pg_dumpall"
-    default_dump_args = "-Fc"
+    default_dump_args = "-Fc -U USER"
     default_restore_binary = "pg_restore"
     default_restore_args = "-Fc -U USER -d DATABASE"
     plain_file_extension = ".dump"
 
     def dump(self) -> str:
         env = self.get_container_env()
-        user = env.get("POSTGRES_USER", "postgres")
+        user = env.get("POSTGRES_USER") or "postgres"
 
-        return f"{self.get_dump_binary()} -U {user} {self.get_dump_args()}"
+        return f"{self.get_dump_binary()} {self.get_dump_args()}".replace("USER", user)
 
     def get_restore_args(self) -> str:
         env = self.get_container_env()
