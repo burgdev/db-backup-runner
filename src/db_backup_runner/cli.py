@@ -10,12 +10,28 @@ from db_backup_runner.utils import DEFAULT_BACKUP_DIR, compression_algorithms
 
 
 @click.group()
-@click.option("-v", "--verbose", is_flag=True, help="Enable verbose output.")
+@click.option(
+    "-v",
+    "--verbose",
+    count=True,
+    help="Enable verbose output.",
+    envvar="DB_BACKUP_VERBOSE",
+)
 def cli(verbose):
     # Configure logger to use a custom format
     logger.remove()  # Remove the default handler
-    log_level = "DEBUG" if verbose else "INFO"
-    logger.add(sys.stdout, format="<level>{level}: {message}</level>", level=log_level)
+    log_level = "INFO"
+    if verbose > 0:
+        log_level = "DEBUG"
+    if verbose > 1:
+        log_level = "TRACE"
+
+    logger.add(
+        sys.stdout,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</> {message}",
+        level=log_level,
+    )
+    logger.trace("Setup logging with trace level.")
 
 
 def compression_option():
@@ -56,18 +72,43 @@ def webhook_option():
     return click.option(
         "-w",
         "--webhook",
+        "webhook_url",
         help="Heartbeat webhook address.",
         envvar="WEBHOOK",
         default="",
     )
 
 
+def project_name_option():
+    return click.option(
+        "-p",
+        "--project",
+        "project_name",
+        help="Project name, used if it is not started with docker compose.",
+        envvar="DB_BACKUP_PROJECT_NAME",
+        default="",
+    )
+
+
+def global_option():
+    return click.option(
+        "-g",
+        "--global",
+        "global_mode",
+        help="Run in global mode, backup any container (e.g. not just the one defined in 'project'.).",
+        envvar="DB_BACKUP_GLOBAL",
+        is_flag=True,
+        default=False,
+    )
+
+
 @cli.command()
 @click.option(
-    "-s",
-    "--schedule",
+    "-c",
+    "--cron",
+    "schedule",
     help="Cron schedule (https://crontab.guru), per default it runs at 2am every day.",
-    envvar="SCHEDULE",
+    envvar="DB_BACKUP_CRON",
     show_default=True,
     default="0 2 * * *",
 )
@@ -80,19 +121,14 @@ def webhook_option():
     type=bool,
 )
 @compression_option()
+@project_name_option()
 @backup_dir_option()
 @use_timestamp_option()
 @webhook_option()
-def scheduled_backup(
-    schedule, on_startup, compression, backup_dir, use_timestamp, webhook
-):
+@global_option()
+def backup_cron(schedule, on_startup, backup_dir, **kwargs):
     "Run backup based on the schedule."
-    manager = BackupManager(
-        compression=compression,
-        backup_dir=Path(backup_dir),
-        use_timestamp=use_timestamp,
-        webhook_url=webhook,
-    )
+    manager = BackupManager(backup_dir=Path(backup_dir), **kwargs)
     if on_startup:
         logger.info("Running backup on startup.")
         manager.backup(datetime.now())
@@ -103,16 +139,16 @@ def scheduled_backup(
 
 @cli.command()
 @compression_option()
+@project_name_option()
 @backup_dir_option()
 @use_timestamp_option()
 @webhook_option()
-def backup(compression, backup_dir, use_timestamp, webhook):
+@global_option()
+def backup(backup_dir, **kwargs):
     "Run a manual backup."
     manager = BackupManager(
-        compression=compression,
         backup_dir=Path(backup_dir),
-        use_timestamp=use_timestamp,
-        webhook_url=webhook,
+        **kwargs,
     )
     sys.exit(manager.backup(datetime.now()))
 

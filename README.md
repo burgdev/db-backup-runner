@@ -43,7 +43,7 @@ services:
     container_name: docker-db-auto-backup
     command: "scheduled-backup --on-startup" # optional
     environment:
-      SCHEDULE: "0 4 * * *" # https://crontab.guru
+      DB_BACKUP_CRON: "0 4 * * *" # https://crontab.guru
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
       - ./backups:/tmp/db_backup_runner # backup directory
@@ -74,7 +74,7 @@ All other labels are optional and usually nor needed:
 
 ## Parameters or Environment Variables
 
-- `-s`, `--schedule`, `SCHEDULE`: Cron schedule (https://crontab.guru), per default it runs at 2am every day.
+- `-s`, `--cron`, `DB_BACKUP_CRON`: Cron schedule (https://crontab.guru), per default it runs at 2am every day.
 - `-c`, `--compression`, `COMPRESSION`: Compression algorithm , supported values: plain, gzip, lzma, xz, bz2
 - `-w`, `--webhook`, `WEBHOOK`: Webhook address in case of success or error.
 - `-t`, `--use-timestamp`, `USE_TIMESTAMP`: Add timestamp to filename.

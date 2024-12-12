@@ -12,6 +12,7 @@ import pycron
 from docker.models.containers import Container
 from tqdm.auto import tqdm
 
+import socket
 from db_backup_runner.provider import BACKUP_PROVIDERS, BackupProviderBase
 from db_backup_runner.utils import (
     DEFAULT_BACKUP_DIR,
@@ -32,6 +33,8 @@ class BackupManager:
         use_timestamp: bool = False,
         use_secret: bool = False,
         webhook_url: str = "",
+        project_name: str = "",
+        global_mode: bool = False,
     ):
         self.compression: CompressionAlgorithm = compression
         self.backup_dir = backup_dir
@@ -41,6 +44,8 @@ class BackupManager:
         )
         self.use_secret = use_secret
         self.webhook_url = webhook_url
+        self.global_mode = global_mode
+        self.porject_name = project_name
         try:
             self.docker_client = docker.from_env()
         except DockerException:
@@ -65,9 +70,75 @@ class BackupManager:
             return name.with_suffix(provider.plain_file_extension)
         return name
 
+    def get_my_container_id(self):
+        return socket.gethostname()
+
+    def get_compose_project(self):
+        if self.global_mode:
+            return None
+        if self.porject_name:
+            return self.porject_name
+        my_id = self.get_my_container_id()
+        logger.debug(f"Looking for my container with id '{my_id}'")
+        containers = self.docker_client.containers.list(filters={"id": my_id})
+        if len(containers) == 0:
+            logger.debug(f"Could not find any container with id '{my_id}'")
+        else:
+            container = containers[0]
+            logger.debug(f"Found the container named '{container.name}'")
+            labels = container.labels or {}
+            if "com.docker.compose.project" in labels:
+                project_name = labels["com.docker.compose.project"]
+                logger.info(
+                    f"Found the project name from docker compose label '{project_name}'"
+                )
+                return project_name
+        project_name = Path().cwd().name
+        logger.info(f"Use the project name from current directory '{project_name}'")
+        if project_name:
+            return project_name
+        logger.error(
+            "Could not find the project name, use '--compose NAME' or '--global' flag."
+        )
+        return None
+
     def get_enabled_containers(self) -> Iterable[Container]:
-        filters = {"label": "db-backup-runner.enable=true"}
-        return self.docker_client.containers.list(filters=filters)
+        enable_filters = {"label": "db-backup-runner.enable=true"}
+        enabled_containers = self.docker_client.containers.list(filters=enable_filters)
+        logger.trace(
+            f"Enabled containers: {', '.join([str(c.name) for c in enabled_containers])}."
+        )
+        project_containers = []
+        project_name = self.get_compose_project()
+        if project_name is not None and not self.global_mode:
+            project_filters = {
+                "label": f"com.docker.compose.project={self.get_compose_project()}"
+            }
+            project_containers = self.docker_client.containers.list(
+                filters=project_filters
+            )
+            logger.trace(
+                f"Project containers: {', '.join([str(c.name) for c in project_containers])}."
+            )
+
+        containers = (
+            enabled_containers
+            if self.global_mode
+            else list(set(enabled_containers) & set(project_containers))
+        )
+        if len(containers) == 0:
+            logger.error(
+                "No containers found, did you add the label 'db-backup-runner.enable=true'?"
+            )
+            if not self.global_mode:
+                logger.error(
+                    f"No containers found for project '{project_name}', use '--compose NAME' or '--global' flag."
+                )
+            else:
+                logger.info("You are running in '--global' mode.")
+            sys.exit(1)
+
+        return containers
 
     def get_backup_provider(self, container: Container) -> Optional[BackupProviderBase]:
         for provider_cls in self.BACKUP_PROVIDERS:
@@ -84,6 +155,7 @@ class BackupManager:
         logger.info("Starting backup...")
         containers = self.get_enabled_containers()
         logger.info(f"Found {len(list(containers))} containers.")
+        logger.debug(f"Containers: {', '.join([str(c.name) for c in containers])}.")
 
         backed_up_containers = []
         fails = 0
@@ -166,8 +238,10 @@ if __name__ == "__main__":
     logger.remove()  # Remove the default handler
     logger.add(sys.stdout, format="<level>{level}: {message}</level>", level="DEBUG")
     manager = BackupManager()
-    if os.environ.get("SCHEDULE"):
-        logger.info(f"Running backup with schedule '{os.environ.get('SCHEDULE')}'.")
+    if os.environ.get("DB_BACKUP_CRON"):
+        logger.info(
+            f"Running backup with schedule '{os.environ.get('DB_BACKUP_CRON')}'."
+        )
         pycron.start()
     elif len(sys.argv) > 1 and sys.argv[1] == "restore":
         if len(sys.argv) != 4:

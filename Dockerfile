@@ -48,4 +48,4 @@ COPY --from=builder --chown=app:app /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 
 ENTRYPOINT ["db-backup-runner"]
-CMD ["scheduled-backup"]
+CMD ["backup-cron"]
