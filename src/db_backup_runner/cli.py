@@ -27,7 +27,7 @@ def cli(verbose):
         log_level = "TRACE"
 
     logger.add(
-        sys.stdout,
+        sys.stderr,
         format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</> {message}",
         level=log_level,
     )
@@ -154,12 +154,21 @@ def backup(backup_dir, **kwargs):
 
 
 @cli.command()
-@click.argument("container_name")
-@click.argument("backup_file", type=click.Path(exists=True))
-def restore(container_name, backup_file):
+@click.option(
+    "-t",
+    "--target",
+    metavar="CONTAINER|SERVICE",
+    help="Optional target which is either a container id, name or service name.",
+    envvar="DB_TARGET",
+)
+@click.argument(
+    "restore_file", type=click.Path(exists=True)
+)  # TODO: support for directory and create filepath automatically
+# warning on missing files
+def restore(target, restore_file):
     "Restore a backup for a specific container."
     manager = BackupManager()
-    manager.restore(container_name, Path(backup_file))
+    manager.restore(target=target, restore_file=Path(restore_file))
 
 
 if __name__ == "__main__":

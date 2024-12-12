@@ -26,7 +26,7 @@ services:
     labels:
       - "db-backup-runner.enable=true"
       # optional
-      - `db-backup-runner.dump_args=--data-only`
+      - `db-backup-runner.dump_args=-Ft`
 
   redis:
     image: redis:alpine
@@ -52,7 +52,7 @@ services:
 The backup container runs a cron job which backs up all container which are enabled and have a
 backup provider. At the moment the following providers are supported:
 
-- Postgres (`db_dumpall`)
+- Postgres (`db_dump`)
 - MariaDB (`mariadb-dump`)
 - MySQL (`mysqldump`)
 - Redis (`redis-cli`)
@@ -75,16 +75,25 @@ All other labels are optional and usually nor needed:
 ## Parameters or Environment Variables
 
 - `-s`, `--cron`, `DB_BACKUP_CRON`: Cron schedule (https://crontab.guru), per default it runs at 2am every day.
-- `-c`, `--compression`, `COMPRESSION`: Compression algorithm , supported values: plain, gzip, lzma, xz, bz2
+- `-c`, `--compression`, `COMPRESSION`: Compression algorithm , supported values: plain, gzip, lzma, xz, bz2. Default is `plain`, it is better to use the compression by the DB if supported.
 - `-w`, `--webhook`, `WEBHOOK`: Webhook address in case of success or error.
 - `-t`, `--use-timestamp`, `USE_TIMESTAMP`: Add timestamp to filename.
 - `-b`, `--backup-dir`, `BACKUP_DIR`: Different backup directory (only used if run outside of a container, defaults to `/tmp/db_backup_runner`).
 - `-o`, `--on-startup`, `ON_STARTUP`: Run a backup when the container starts.
 
+## Configuration
+
+### Postgres
+
+- `dump_binary`: `pg_dump`, change this to use e.g. `pg_dumpall`.
+- `dump_args`: `-Fc -U USER`, remove it if `pg_dumpall` is used, which only supports `sql`.
+- `restore_binary`: `pg_restore`
+- `restore_args`: `-Fc -U USER -d DATABSE`
+
 ## Todos
 
 - [x] Only upload images from the same stack
-- [ ] At the moment the `restore` function is not implemented yet.
+- [x] At the moment the `restore` function is not implemented yet -> generates bash script
 - [ ] Upload files into the "cloud"
 
 # Credits
