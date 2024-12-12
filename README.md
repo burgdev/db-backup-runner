@@ -41,7 +41,7 @@ services:
     image: ghcr.io/burgdev/db-backup-runner:next-alpine # (~60MB)
     restart: unless-stopped
     container_name: docker-db-auto-backup
-    command: "scheduled-backup --on-startup" # optional
+    command: "backup-cron --on-startup" # optional
     environment:
       DB_BACKUP_CRON: "0 4 * * *" # https://crontab.guru
     volumes:
