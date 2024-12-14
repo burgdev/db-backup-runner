@@ -111,6 +111,6 @@ def build(
 
 
 @task
-def publish(c: Ctx):
+def publish(c: Ctx, no_version_tag: bool = False):
     """Publish to docker registry"""
-    build(c, push=True)
+    build(c, push=True, version_tag=not no_version_tag)
