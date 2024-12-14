@@ -51,9 +51,9 @@ jobs:
             # Use a custom tag if manually dispatched
             type=raw,value=${{ github.event.inputs.custom_tag || '' }}
             # Semantic version tags
-            type=semver,pattern={{version}},value=v{{version}}
-            type=semver,pattern={{version}},value=v{{major}}.{{minor}}
-            type=semver,pattern={{version}},value=v{{major}}
+            type=semver,pattern={{version}},value={{version}}
+            type=semver,pattern={{version}},value={{major}}.{{minor}}
+            type=semver,pattern={{version}},value={{major}}
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`.
       # If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
