@@ -2,15 +2,6 @@ from tasks import info, error, success, warning, echo, env, task, Ctx, EnvError 
 
 
 @task
-def install(c: Ctx):
-    """Install the uv environment and install the pre-commit hooks"""
-    echo("🚀 Creating virtual environment using pyenv and poetry")
-    c.run("uv sync")
-    c.run("uv run pre-commit install")
-    echo("Run 'source .venv/bin/activate'")
-
-
-@task
 def update_venv(c: Ctx, dry: bool = False):
     """Updated venv activate script with custom commands"""
     commands = [
@@ -23,7 +14,18 @@ def update_venv(c: Ctx, dry: bool = False):
     for cmd in commands:
         info(f"Append '{cmd}' to activate script")
         c.run(f"echo '{cmd}' >> .venv/bin/activate") if not dry else None
-    info("Run 'source .venv/bin/activate'")
     success("Updated venv activate script") if not dry else success(
         "Would have updated venv activate script"
     )
+    info("Run 'source .venv/bin/activate'")
+
+
+@task(help={"venv_update": "Updates venv activate script (runs per default)"})
+def install(c: Ctx, venv_update: bool = True):
+    """Install the uv environment and install the pre-commit hooks"""
+    echo("🚀 Creating virtual environment using pyenv and poetry")
+    c.run("uv sync")
+    c.run("uv run pre-commit install")
+    if venv_update:
+        update_venv(c)
+    success("Installation done, your are ready to go ...")

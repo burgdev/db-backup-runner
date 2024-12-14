@@ -12,9 +12,12 @@ def echo(*args, **kwargs):
 
 
 def header(msg: str, symb="-", style="blue bold", max_length=80):
+    min_ = 6
+    max_ = max_length - min_ - 2
     length = len(msg)
-    end = symb * (max_length - length) if length < max_length else symb * 2
-    echo(f"[dim]{symb*2}[/] [{style}]{msg}[/] [dim]{end}[/]")
+    start = f"[dim]{symb * (max_ - length) if length < max_ else symb * min_}[/]"
+    end = f"[dim]{symb*min_}[/]"
+    echo(f"{start} [{style}]{msg} {end}")
 
 
 def info(msg: str):

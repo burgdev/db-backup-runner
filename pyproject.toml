@@ -14,14 +14,19 @@ dependencies = [
   "tqdm>=4.67.1",
 ]
 
+[tool.docker]
+registry = "ghcr.io/burgdev"
+
 [dependency-groups]
 dev = [
   "deptry>=0.21.1",
   "environs>=11.2.1",
+  "humanize>=4.11.0",
   "invoke>=2.2.0",
   "pre-commit>=4.0.1",
   "pyright>=1.1.390",
   "pytest>=8.3.4",
+  "python-on-whales>=0.74.0",
   "rich>=13.9.4",
   "ruff>=0.8.2",
   "types-requests>=2.32.0.20241016",
@@ -42,9 +47,7 @@ check = [
 ]
 test = "uv run pytest tests/"
 stage-release = "python3 ./scripts/stage-release --output staged-release.zip"
-format-code = [
-  { cmd = "uv run ruff format ." },
-]
+format-code = [{ cmd = "uv run ruff format ." }]
 # Similar to check, but also auto fixes issues.
 auto-check = [
   { cmd = "uv run ruff check --fix ." },
@@ -64,8 +67,15 @@ db-backup-runner = "db_backup_runner:cli"
 known-third-party = ["db_backup_runner"]
 
 [tool.deptry.per_rule_ignores]
-DEP001 = ["_logger", "_env", "project"] # only in dev
-DEP004 = ["rich", "icecream", "invoke", "environs"] # only in dev
+DEP001 = ["_logger", "_env", "project", "check"] # only for invoke
+DEP004 = [
+  "rich",
+  "icecream",
+  "invoke",
+  "environs",
+  "humanize",
+  "python_on_whales",
+] # only in dev
 DEP003 = ["db_backup_runner"] # transitive dependencies
 #DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
 
