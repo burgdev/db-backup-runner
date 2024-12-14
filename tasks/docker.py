@@ -33,12 +33,13 @@ def from_pyproject(c: Ctx, name: str):
 def check_dirty_files(c: Ctx, force: bool = False):
     dirty_files = (
         c.run("git diff-files --name-only", hide=True)
-        .stdout.strip("\n")
+        .stdout.strip()
+        .strip("\n")
         .strip()
         .split("\n")
     )
     echo(dirty_files)
-    if dirty_files:
+    if dirty_files and dirty_files[0] != [""]:
         header("Git dirty check")
         warning("Dirty  git files:")
         for f in dirty_files:
