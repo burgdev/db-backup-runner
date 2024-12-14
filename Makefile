@@ -13,23 +13,31 @@ REGISTRY=ghcr.io
 NEXT_DOCKER_IMAGE=${REPO}:${NEXT_TAG}
 NEXT_DOCKER_IMAGE_SLIM=${REPO}:${NEXT_TAG}-slim
 
-.PHONY: install
-install: ## Install the poetry environment and install the pre-commit hooks
-	@echo "🚀 Creating virtual environment using pyenv and poetry"
+.PHONY: init
+init: ## Install the uv environment and install the pre-commit hooks
+	@echo "Creating virtual environment using uv"
 	@uv sync
-	@ uv run pre-commit install
-	@echo "Run 'source .venv/bin/activate'"
+	@ uv run invoke install
+#@ uv run pre-commit install
+#@echo "Run 'source .venv/bin/activate'"
 
-.PHONY: check
-check: ## Run code quality tools.
-	@echo "🚀 Checking uv lock file consistency with 'pyproject.toml': Running uv lock --locked"
-	@uv lock --locked
-	@echo "🚀 Linting code: Running pre-commit"
-	@uv run pre-commit run -a
-	@echo "🚀 Checking for obsolete dependencies: Running deptry"
-	@uv run deptry .
-	@echo "🚀 Static type checking: Running pyright"
-	@uv run pyright
+#.PHONY: install
+#install: ## Install the poetry environment and install the pre-commit hooks
+#	@echo "🚀 Creating virtual environment using pyenv and poetry"
+#	@uv sync
+#	@ uv run pre-commit install
+#	@echo "Run 'source .venv/bin/activate'"
+#
+#.PHONY: check
+#check: ## Run code quality tools.
+#	@echo "🚀 Checking uv lock file consistency with 'pyproject.toml': Running uv lock --locked"
+#	@uv lock --locked
+#	@echo "🚀 Linting code: Running pre-commit"
+#	@uv run pre-commit run -a
+#	@echo "🚀 Checking for obsolete dependencies: Running deptry"
+#	@uv run deptry .
+#	@echo "🚀 Static type checking: Running pyright"
+#	@uv run pyright
 
 .PHONY: test
 test: ## Test the code with pytest
@@ -64,11 +72,11 @@ docs-test: ## Test if documentation can be built without warnings or errors
 docs: ## Build and serve the documentation
 	@uv run mkdocs serve -a localhost:8083 -w src
 
-docker-login: # Login to ghcr (github container registry)
-	@echo "Make sure to have run:"
-	@echo "export GITHUB_USERNAME=user"
-	@echo "export GITHUB_TOKEN=token"
-	echo ${GITHUB_TOKEN} | docker login ghcr.io -u GITHUB_USERNAME --password-stdin
+#docker-login: # Login to ghcr (github container registry)
+#	@echo "Make sure to have run:"
+#	@echo "export GITHUB_USERNAME=user"
+#	@echo "export GITHUB_TOKEN=token"
+#	echo ${GITHUB_TOKEN} | docker login ghcr.io -u GITHUB_USERNAME --password-stdin
 
 docker-push: docker-build docker-login # Push docker image
 	docker push ${REGISTRY}/${ORGANIZATION}/${DOCKER_IMAGE}
@@ -104,4 +112,4 @@ docker-slim: docker-build## Build slim docker image (based on docker build)
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := init

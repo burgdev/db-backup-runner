@@ -8,6 +8,18 @@ Here is a _docker-compose.yaml_ file with two databases and one backup container
 
 ```yaml
 services:
+  # Backup container
+  db-backup:
+    image: ghcr.io/burgdev/db-backup-runner:next-alpine # (~60MB)
+    restart: unless-stopped
+    container_name: docker-db-auto-backup
+    command: "backup-cron --on-startup" # optional
+    environment:
+      DB_BACKUP_CRON: "0 4 * * *" # https://crontab.guru
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
+      - ./backups:/tmp/db_backup_runner # backup directory
+
   app:
     image: myapp:latest
     environment:
@@ -17,7 +29,7 @@ services:
       - db
       - redis
 
-  db:
+  postgis:
     image: postgis/postgis:16-3-alpine  # PostgreSQL with PostGIS support
     environment:
       POSTGRES_USER: user
@@ -35,18 +47,6 @@ services:
       # optional
       - "db-backup-runner.backup_provider=redis"
       - "db-backup-runner.webhook=none" # disable global webhook for thos container
-
-  # Backup container
-  db-backup:
-    image: ghcr.io/burgdev/db-backup-runner:next-alpine # (~60MB)
-    restart: unless-stopped
-    container_name: docker-db-auto-backup
-    command: "backup-cron --on-startup" # optional
-    environment:
-      DB_BACKUP_CRON: "0 4 * * *" # https://crontab.guru
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
-      - ./backups:/tmp/db_backup_runner # backup directory
 ```
 
 The backup container runs a cron job which backs up all container which are enabled and have a
@@ -89,6 +89,43 @@ All other labels are optional and usually nor needed:
 - `dump_args`: `-Fc -U USER`, remove it if `pg_dumpall` is used, which only supports `sql`.
 - `restore_binary`: `pg_restore`
 - `restore_args`: `-Fc -U USER -d DATABSE`
+
+## Restore
+
+### Docker Compose
+
+Restoring is not fully implemented yet, but you can create a bash script which helps to
+restore the data base. This gives you also the flexibility to change it accordingly to
+your needs.
+
+```bash
+ docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump
+ #> shows the backup commands
+ # you can save it into a script
+ docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump restore.sh
+ chmod +x restore.sh
+ vim restore.sh # make sure everything is correct, replace DATABASE with the correct database
+ ./restore.sh # run it from the host
+```
+
+Your can create the script for just one service:
+
+```bash
+ docker compose exec db-backup db-backup-runner restore --target redis ./.../redis.redis.rdb
+```
+
+This are the main commands needed to restore a database
+
+```bash
+# copy dump file into the docker container
+docker compose cp backups/postgis/postgis.postgres.dump psql:/tmp/db.dump
+docker compose exec postgis pg_restore -Fc -U USER -d DATABASE /tmp/db.dump
+```
+
+### Host
+
+You can run the `db-backup-runner` script directly on your host.
+Install this package and use the same commands as above without `docker compose exec`
 
 ## Todos
 

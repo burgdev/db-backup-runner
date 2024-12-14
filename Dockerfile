@@ -20,9 +20,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
   --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
   uv sync --frozen --no-install-project --no-dev
 
-COPY ./src README.md ./pyproject.toml ./uv.lock /app/
+COPY ./src ./pyproject.toml ./uv.lock /app/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
+  --mount=type=bind,source=README.md,target=README.md \
   uv sync --frozen --no-dev
 
 
@@ -43,7 +44,7 @@ FROM python:3.12-alpine
 WORKDIR /app
 
 # Copy the application from the builder
-COPY --from=builder --chown=app:app /app /app
+COPY --from=builder /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
