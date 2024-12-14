@@ -46,8 +46,8 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             # Add 'edge' tag for main and develop branches
-            type=edge,pattern=main,value=edge
-            type=edge,pattern=develop,value=edge
+            type=edge,pattern=main
+            type=edge,pattern=develop
             # Use a custom tag if manually dispatched
             type=raw,value=${{ github.event.inputs.custom_tag || '' }}
             # Semantic version tags
