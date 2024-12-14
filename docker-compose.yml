@@ -3,12 +3,11 @@ services:
     build:
       context: .
     restart: unless-stopped
-    command: "sleep infinity"
+    command: "backup-cron --on-startup"
     container_name: docker-db-auto-backup
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - ./backups:/var/backups
-      - /app/db-auto-backup.py:/usr/src/db-auto-backup/db-auto-backup.py:ro
+      - ./backups:/tmp/db_backup_runner
     depends_on:
       - psql
       - mariadb

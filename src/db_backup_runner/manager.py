@@ -111,9 +111,7 @@ class BackupManager:
         project_containers = []
         project_name = self.get_compose_project()
         if project_name is not None and not self.global_mode:
-            project_filters = {
-                "label": f"com.docker.compose.project={self.get_compose_project()}"
-            }
+            project_filters = {"label": f"com.docker.compose.project={project_name}"}
             project_containers = self.docker_client.containers.list(
                 filters=project_filters
             )
@@ -204,6 +202,9 @@ class BackupManager:
 
             if provider.validate_file(backup_temp_file_path):
                 os.replace(backup_temp_file_path, backup_filepath)
+                logger.info(
+                    f"Backup complete: '{backup_filepath}' (path from inside the container!)"
+                )
                 if fails == 0:
                     # if any fail occured we do not trigger any heartbeat anymore
                     provider.trigger_success_webhook(

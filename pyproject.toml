@@ -17,9 +17,12 @@ dependencies = [
 [dependency-groups]
 dev = [
   "deptry>=0.21.1",
+  "environs>=11.2.1",
+  "invoke>=2.2.0",
   "pre-commit>=4.0.1",
   "pyright>=1.1.390",
   "pytest>=8.3.4",
+  "rich>=13.9.4",
   "ruff>=0.8.2",
   "types-requests>=2.32.0.20241016",
 ]
@@ -29,6 +32,27 @@ dev = [
 # Use an unreleased version to support non-async jobs
 # https://github.com/whdev1/pycron/pull/1
 python-cron = { git = "https://github.com/whdev1/pycron", rev = "e40f465940f1632b753b75c819364b20ed85e1ca" }
+
+
+[tool.poe.tasks]
+check = [
+  { cmd = "uv run ruff check ." },
+  { cmd = "uv run ruff format --diff ." },
+  { cmd = "uv run pyright" },
+]
+test = "uv run pytest tests/"
+stage-release = "python3 ./scripts/stage-release --output staged-release.zip"
+format-code = [
+  { cmd = "uv run ruff format ." },
+]
+# Similar to check, but also auto fixes issues.
+auto-check = [
+  { cmd = "uv run ruff check --fix ." },
+  { cmd = "uv run ruff format ." },
+  { cmd = "uv run pyright" },
+]
+prcheck = ["check", "test"]
+
 
 [project.scripts]
 db-backup-runner = "db_backup_runner:cli"
@@ -40,7 +64,8 @@ db-backup-runner = "db_backup_runner:cli"
 known-third-party = ["db_backup_runner"]
 
 [tool.deptry.per_rule_ignores]
-DEP004 = ["rich", "icecream"] # only in dev
+DEP001 = ["_logger", "_env", "project"] # only in dev
+DEP004 = ["rich", "icecream", "invoke", "environs"] # only in dev
 DEP003 = ["db_backup_runner"] # transitive dependencies
 #DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
 

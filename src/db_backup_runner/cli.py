@@ -154,6 +154,7 @@ def backup(backup_dir, **kwargs):
 
 
 @cli.command()
+@project_name_option()
 @click.option(
     "-t",
     "--target",
@@ -162,12 +163,12 @@ def backup(backup_dir, **kwargs):
     envvar="DB_TARGET",
 )
 @click.argument(
-    "restore_file", type=click.Path(exists=True)
+    "restore_file",  # type=click.Path(exists=True)
 )  # TODO: support for directory and create filepath automatically
 # warning on missing files
-def restore(target, restore_file):
+def restore(target, restore_file, **kwargs):
     "Restore a backup for a specific container."
-    manager = BackupManager()
+    manager = BackupManager(**kwargs)
     manager.restore(target=target, restore_file=Path(restore_file))
 
 
