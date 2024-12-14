@@ -37,6 +37,7 @@ def check_dirty_files(c: Ctx, force: bool = False):
         .strip("\n")
         .split("\n")
     )
+    echo(dirty_files)
     if dirty_files:
         header("Git dirty check")
         warning("Dirty  git files:")
