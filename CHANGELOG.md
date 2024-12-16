@@ -1,11 +1,12 @@
 # Changelog
 
-## 0.1.2
+All notable changes to this project will be documented in this file.
 
-<!-- No changes -->
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- No changes -->
+## 0.1.3
 
-<!-- No changes -->
+### Features
 
-<!-- No changes -->
+- Improved restore script ([#2](https://github.com/burgdev/db-backup-runner/pull/2))
+- Command to automatically create a restore script. ([#1](https://github.com/burgdev/db-backup-runner/pull/1))
