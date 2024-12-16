@@ -1,4 +1,4 @@
-from tasks import info, error, success, warning, echo, env, task, Ctx, EnvError  # noqa: F401
+from tasks import info, error, success, warning, echo, header, env, task, Ctx, EnvError  # noqa: F401
 
 
 @task
@@ -31,25 +31,49 @@ def install(c: Ctx, venv_update: bool = True):
     success("Installation done, your are ready to go ...")
 
 
-@task(help={"force": "Force tag creation and pushing"})
-def release(c: Ctx, force: bool = True):
+@task(
+    help={
+        "add_tag": "Add the new tag and push it to remote",
+        "unreleased": "Show only unreleased changes",
+        "length": "Number of lines to show (mutual exclusive with unreleased)",
+    }
+)
+def release(
+    c: Ctx,
+    add_tag: bool = False,
+    dry: bool = False,
+    unreleased: bool = True,
+    length: int = -1,
+):
     """Prepare a release, update CHANGELOG file and bump versions"""
-    echo("🚀 Creating virtual environment using pyenv and poetry")
-    out = c.run("rooster release")
-    last_tag = None
-    new_tag = None
-    for line in out.stdout.split("\n"):
-        if "last version tag" in line:
-            last_tag = line.split(" ")[-1]
-        elif "new version" in line:
-            new_tag = line.split(" ")[-1]
+    new_tag = c.run("git-cliff --bumped-version", hide=True).stdout.strip()
+    if dry:
+        unreleased = unreleased if length < 0 else False
+        length = 0 if (not unreleased and length < 0) else length
+        echo("Show only 'unreleased' changes") if unreleased else (
+            echo(f"Show {length} lines of changelog")
+            if length > 0
+            else echo("Show full changelog")
+        )
+        header("Changelog start") if dry else None
+        cl = (
+            c.run(f"git-cliff --bump {'--unreleased' if unreleased else ''}", hide=True)
+            .stdout.strip()
+            .split("\n")
+        )
+        if unreleased or length == 0:
+            echo("\n".join(cl))
+        else:
+            echo(f"{"\n".join(cl[:length])}\n...\n")
+        header("Changelog end") if dry else None
+    else:
+        cl = c.run("git-cliff --bump -o", hide=True).stdout.strip().split("\n")
+        # only prepend new tag -- this way it is possible to edit it.
+        # cl = c.run(f"git-cliff --bump {'--prepend CHANGELOG.md' if dry else '-o'}", hide=True).stdout.strip().split("\n")
     if new_tag:
-        success(
-            f"Bump from version '{last_tag}' to '{new_tag}'."
-        ) if last_tag else success(f"Bump to version '{new_tag}'.")
-        if input(f"Create new tag 'v{new_tag}' [N/y]: ").lower() in ["yes", "y"]:
-            c.run(f"git tag -f 'v{new_tag}'")
-            if input("Push tags [N/y]: ").lower() in ["yes", "y"]:
-                c.run(f"git push origin 'v{new_tag}'")
+        success(f"Bumped to version '{new_tag}'.")
+        if add_tag and not dry:
+            c.run(f"git tag -f '{new_tag}'")
+            c.run(f"git push origin '{new_tag}'")
     else:
         warning("Did not update to new version tag.")
