@@ -1,4 +1,4 @@
-from tasks import info, error, success, warning, echo, header, env, task, Ctx, EnvError  # noqa: F401
+from tasks import info, error, success, header, warning, echo, env, task, Ctx, EnvError  # noqa: F401
 
 
 @task
