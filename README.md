@@ -136,6 +136,8 @@ Install this package and use the same commands as above without `docker compose 
 make
 ```
 
+### Commands
+
 After this the command `inv` is used:
 
 ```bash
@@ -154,6 +156,12 @@ source <(infisical export --path /github)
 # or only set  the token
 export GITHUB_TOKEN=$(infisical secrets get --path /github GITHUB_TOKEN --plain)
 ```
+
+### Release
+
+For a release run `inv release`.
+Merge this change into the `main` branch and tag it accordingly
+and if needed create a GitHub release.
 
 ## Todos
 
