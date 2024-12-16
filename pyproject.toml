@@ -1,6 +1,6 @@
 [project]
 name = "db-backup-runner"
-version = "0.1.1"
+version = "0.1.2"
 description = "Run any db backups (and others) from inside its own docker container"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -79,18 +79,6 @@ DEP004 = [
 ] # only in dev
 DEP003 = ["db_backup_runner"] # transitive dependencies
 #DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
-
-[tool.rooster]
-major_labels = []                                            # We do not use the major version number yet
-minor_labels = ["release:breaking"]
-changelog_ignore_labels = ["release:ignore", "type:tooling"]
-"changelog_sections.release.breaking" = "Breaking changes"
-"changelog_sections.type:feature" = "Enhancements"
-"changelog_sections.type:bug" = "Bug fixes"
-"changelog_sections.type:docu" = "Documentation"
-"changelog_sections.type:others" = "Other changes"
-changelog_sections.__unknown__ = "Other changes"
-version_tag_prefix = "v"
 
 [build-system]
 requires = ["hatchling"]
