@@ -4,7 +4,7 @@ Runs a container with a Python script which makes updates from other (database) 
 
 The [container](https://ghcr.io/burgdev/db-backup-runner) needs the `db-backup-runner.enable` label to be set to `true` for the backup.
 
-Here is a _docker-compose.yaml_ file with two databases and one backup container.
+Here is a _docker-compose.yml_ file with two databases and one backup container.
 
 ```yaml
 services:
@@ -74,7 +74,7 @@ All other labels are optional and usually nor needed:
 
 ## Parameters or Environment Variables
 
-- `-s`, `--cron`, `DB_BACKUP_CRON`: Cron schedule (https://crontab.guru), per default it runs at 2am every day.
+- `-s`, `--cron`, `DB_BACKUP_CRON`: Cron schedule (<https://crontab.guru>), per default it runs at 2am every day.
 - `-c`, `--compression`, `COMPRESSION`: Compression algorithm , supported values: plain, gzip, lzma, xz, bz2. Default is `plain`, it is better to use the compression by the DB if supported.
 - `-w`, `--webhook`, `WEBHOOK`: Webhook address in case of success or error.
 - `-t`, `--use-timestamp`, `USE_TIMESTAMP`: Add timestamp to filename.
@@ -94,9 +94,9 @@ All other labels are optional and usually nor needed:
 
 ### Docker Compose
 
-Restoring is not fully implemented yet, but you can create a bash script which helps to
-restore the data base. This gives you also the flexibility to change it accordingly to
-your needs.
+Restoring is not fully implemented yet, but you can create a bash script which
+helps to restore the data base.
+This gives you also the flexibility to change it accordingly to your needs.
 
 ```bash
  docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump
@@ -104,7 +104,8 @@ your needs.
  # you can save it into a script
  docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump restore.sh
  chmod +x restore.sh
- vim restore.sh # make sure everything is correct, replace DATABASE with the correct database
+ # make sure everything is correct, replace DATABASE with the correct database
+ vim restore.sh
  ./restore.sh # run it from the host
 ```
 
@@ -127,6 +128,33 @@ docker compose exec postgis pg_restore -Fc -U USER -d DATABASE /tmp/db.dump
 You can run the `db-backup-runner` script directly on your host.
 Install this package and use the same commands as above without `docker compose exec`
 
+## Development
+
+### Initial Setup
+
+```bash
+make
+```
+
+After this the command `inv` is used:
+
+```bash
+inv --list
+inv install        # install updates
+inv check          # run all quality checks
+inv docker.build   # build a docker image
+```
+
+For some scripts a `GITHUB_TOKEN` is required:
+
+```bash
+# for example with infisical
+# source everthing
+source <(infisical export --path /github)
+# or only set  the token
+export GITHUB_TOKEN=$(infisical secrets get --path /github GITHUB_TOKEN --plain)
+```
+
 ## Todos
 
 - [x] Only upload images from the same stack
@@ -137,5 +165,5 @@ Install this package and use the same commands as above without `docker compose 
 
 Inspired by
 
-- https://github.com/RealOrangeOne/docker-db-auto-backup for some initial source code (2024/12)
-- https://github.com/prodrigestivill/docker-postgres-backup-local for the idea with the docker labels
+- <https://github.com/RealOrangeOne/docker-db-auto-backup> for some initial source code (2024/12)
+- <https://github.com/prodrigestivill/docker-postgres-backup-local> for the idea with the docker labels

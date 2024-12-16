@@ -28,6 +28,7 @@ dev = [
   "pytest>=8.3.4",
   "python-on-whales>=0.74.0",
   "rich>=13.9.4",
+  "rooster-blue>=0.0.8",
   "ruff>=0.8.2",
   "types-requests>=2.32.0.20241016",
 ]
@@ -78,6 +79,19 @@ DEP004 = [
 ] # only in dev
 DEP003 = ["db_backup_runner"] # transitive dependencies
 #DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
+
+[tool.rooster]
+major_labels = []                                            # We do not use the major version number yet
+minor_labels = ["release:breaking"]
+changelog_ignore_labels = ["release:ignore", "type:tooling"]
+changelog_sections.breaking = "Breaking changes"
+#"changelog_sections.release.breaking" = "Breaking changes"
+#"changelog_sections.type:feature" = "Enhancements"
+#"changelog_sections.type:bug" = "Bug fixes"
+#"changelog_sections.type:docu" = "Documentation"
+#"changelog_sections.type:others" = "Other changes"
+#changelog_sections.__unknown__ = "Other changes"
+version_tag_prefix = "v"
 
 [build-system]
 requires = ["hatchling"]
