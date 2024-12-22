@@ -1,0 +1,36 @@
+name: Create Release
+
+on:
+  workflow_run:
+    workflows: ["Main", "Build Docker"]
+    types:
+      - completed
+
+jobs:
+  create-release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-venv
+
+      - name: Get latest changelog
+        id: changelog
+        run: |
+          echo "version=$(uv run inv version)" >> $GITHUB_ENV
+          echo "body<<EOF" >> $GITHUB_ENV
+          echo "$(uv run inv changelog)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ env.version }}
+          release_name: ${{ env.version }}
+          body: ${{ env.body }}
+          draft: true
+          prerelease: false

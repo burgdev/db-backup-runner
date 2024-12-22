@@ -6,6 +6,7 @@ from _env import env, EnvError
 import check
 import docker
 import project
+import changelog
 
 
 ns = Collection(
@@ -15,6 +16,7 @@ ns = Collection(
     project.update_venv,
     check,
     docker,
+    changelog,
 )
 
 
