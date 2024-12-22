@@ -2,7 +2,7 @@ name: Create Release
 
 on:
   workflow_run:
-    workflows: ["Main", "Build Docker"]
+    workflows: ["Main", "Build Docker", "New Version"]
     types:
       - completed
 
@@ -10,6 +10,8 @@ jobs:
   create-release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
