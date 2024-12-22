@@ -2,7 +2,7 @@ name: Create Release
 
 on:
   workflow_run:
-    workflows: ["Main", "Build Docker"]
+    workflows: ["Main", "Build Docker", "New Version"]
     types:
       - completed
 
