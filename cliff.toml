@@ -21,7 +21,7 @@ commit_parsers = [
   { field = "github.pr_labels", pattern = "type:docu", group = "<!-- 40 -->📝 Documentation" },
   { field = "github.pr_labels", pattern = "type:update", group = "<!-- 50 -->🧪 Dependencies" },
   { field = "github.pr_labels", pattern = "type:others", group = "<!-- 60 -->🌀 Miscellaneous" },
-  #{ field = "github.pr_labels", pattern = "type:tooling", group = "<!-- 0 -->🌀 Miscellaneous", default_scope = "Tooling" },
+  #{ field = "github.pr_labels", pattern = "type:chore", group = "<!-- 0 -->🌀 Miscellaneous", default_scope = "Tooling" },
   { field = "github.pr_labels", pattern = ".*", skip = true },
 ]
 

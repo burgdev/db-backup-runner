@@ -1,6 +1,6 @@
 [project]
 name = "db-backup-runner"
-version = "0.1.2"
+version = "0.1.1"
 description = "Run any db backups (and others) from inside its own docker container"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -25,12 +25,13 @@ dev = [
   "humanize>=4.11.0",
   "invoke>=2.2.0",
   "pre-commit>=4.0.1",
-  "pyright>=1.1.390",
+  "pyright>=1.1",
   "pytest>=8.3.4",
   "python-on-whales>=0.74.0",
   "rich>=13.9.4",
   "rooster-blue>=0.0.8",
   "ruff>=0.8.2",
+  "toml>=0.10.2",
   "types-requests>=2.32.0.20241016",
 ]
 
@@ -50,9 +51,12 @@ db-backup-runner = "db_backup_runner:cli"
 [tool.ruff.lint.isort]
 known-third-party = ["db_backup_runner"]
 
+[tool.deptry]
+extend_exclude = ["tasks/__init__.py"]
+
 [tool.deptry.per_rule_ignores]
-DEP001 = ["_logger", "_env", "project", "check"] # only for invoke
 DEP004 = [
+  "toml",
   "rich",
   "icecream",
   "invoke",

@@ -1,0 +1,42 @@
+name: New Version
+
+on:
+  workflow_run:
+    workflows: ["Main"]
+    types:
+      - completed
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-tag:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-venv
+
+      - name: Extract latest version
+        id: latest-version
+        run: |
+          echo "version=$(uv run inv version)" >> $GITHUB_ENV
+
+      - name: Check if tag exists
+        id: tag-check
+        run: |
+          if git rev-parse "v${{ env.version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ env.version }} already exists."
+            exit 0
+          fi
+          echo "New version detected: v${{ env.version }}"
+
+      - name: Create and push tag
+        if: steps.tag-check.outcome == 'success'
+        run: |
+          git tag "v${{ env.version }}"
+          git push origin "v${{ env.version }}"

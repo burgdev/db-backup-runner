@@ -6,9 +6,18 @@ from _env import env, EnvError
 import check
 import docker
 import project
+import changelog
 
 
-ns = Collection(project.install, project.release, project.update_venv, check, docker)
+ns = Collection(
+    project.install,
+    project.release,
+    project.version,
+    project.update_venv,
+    check,
+    docker,
+    changelog,
+)
 
 
 __all__ = (
