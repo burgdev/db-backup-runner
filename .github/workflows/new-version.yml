@@ -26,15 +26,18 @@ jobs:
       - name: Extract latest version
         id: latest-version
         run: |
-          VERSION=$(uv run inv version)
+          VERSION=$(uv run inv version); echo "Current version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
+      - name: Check if tag exists
+        uses: mukunku/tag-exists-action@v1.6.0
+        id: check-tag
+        with:
+          tag: "v${{ env.version }}"
+
       - name: Create and push tag if not exists
+        if: steps.check-tag.outputs.exists == 'true'
         run: |
-          if ! git rev-parse "v${{ env.version }}" >/dev/null 2>&1; then
-            echo "Creating new tag: v${{ env.version }}"
-            git tag "v${{ env.version }}"
-            git push origin "v${{ env.version }}"
-          else
-            echo "Tag v${{ env.version }} already exists. Skipping."
-          fi
+          echo "Creating new tag: v${{ env.version }}"
+          git tag "v${{ env.version }}"
+          git push origin "v${{ env.version }}"
