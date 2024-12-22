@@ -8,7 +8,14 @@ import docker
 import project
 
 
-ns = Collection(project.install, project.release, project.update_venv, check, docker)
+ns = Collection(
+    project.install,
+    project.release,
+    project.version,
+    project.update_venv,
+    check,
+    docker,
+)
 
 
 __all__ = (
