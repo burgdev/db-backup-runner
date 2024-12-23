@@ -5,6 +5,8 @@ from db_backup_runner.provider import BackupProviderBase
 
 
 class PostgresBackupProvider(BackupProviderBase):
+    """Postgres backup provider"""
+
     name = "postgres"
     default_dump_binary = "pg_dump"
     # default_dump_binary = "pg_dumpall"
@@ -14,12 +16,14 @@ class PostgresBackupProvider(BackupProviderBase):
     plain_file_extension = ".dump"
 
     def dump(self) -> str:
+        """Overwrite dump method with custom postgres dump"""
         env = self.get_container_env()
         user = env.get("POSTGRES_USER") or "postgres"
 
         return f"{self.get_dump_binary()} {self.get_dump_args()}".replace("USER", user)
 
     def get_restore_args(self) -> str:
+        """Overwrite restore args with custom postgres arguments"""
         env = self.get_container_env()
         user = env.get("POSTGRES_USER") or "postgres"
         # TODO get database from label or argument
@@ -31,14 +35,3 @@ class PostgresBackupProvider(BackupProviderBase):
             .replace("USER", user)
             .replace("DATABASE", database)
         )
-
-    # def restore(self, backup_file: Path) -> None:
-    #    raise NotImplementedError(f"Restore is not supported yet for {self.name}.")
-    # env = BackupBase.get_container_env(self.container)
-    # user = env.get("POSTGRES_USER", "postgres")
-
-    # restore_binary = BackupBase.get_label(self.container, "pgbackup-runner.restore_binary", "psql")
-    # with backup_file.open("rb") as f:
-    #    self.container.exec_run(
-    #        f"bash -c '{restore_binary} -U {user}'", stdin=True
-    #    )  # , socket_input=f) TODO: does not work

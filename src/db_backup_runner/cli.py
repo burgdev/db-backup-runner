@@ -16,8 +16,10 @@ from db_backup_runner.utils import DEFAULT_BACKUP_DIR, compression_algorithms
     count=True,
     help="Enable verbose output.",
     envvar="DB_BACKUP_VERBOSE",
+    show_envvar=True,
 )
 def cli(verbose):
+    "Main command to backup and restore databases."
     # Configure logger to use a custom format
     logger.remove()  # Remove the default handler
     log_level = "INFO"
@@ -42,6 +44,7 @@ def compression_option():
         envvar="COMPRESSION",
         type=click.Choice(compression_algorithms),
         show_default=True,
+        show_envvar=True,
         default="plain",
     )
 
@@ -53,6 +56,7 @@ def backup_dir_option():
         help="Backup directory.",
         envvar="BACKUP_DIR",
         show_default=True,
+        show_envvar=True,
         default=DEFAULT_BACKUP_DIR,
     )
 
@@ -63,6 +67,7 @@ def use_timestamp_option():
         "--use-timestamp",
         help="Add a timestamp to the backup filename.",
         envvar="USE_TIMESTAMP",
+        show_envvar=True,
         is_flag=True,
         show_default=True,
     )
@@ -75,6 +80,7 @@ def webhook_option():
         "webhook_url",
         help="Heartbeat webhook address.",
         envvar="WEBHOOK",
+        show_envvar=True,
         default="",
     )
 
@@ -86,6 +92,7 @@ def project_name_option():
         "project_name",
         help="Project name, used if it is not started with docker compose.",
         envvar="DB_BACKUP_PROJECT_NAME",
+        show_envvar=True,
         default="",
     )
 
@@ -97,6 +104,7 @@ def global_option():
         "global_mode",
         help="Run in global mode, backup any container (e.g. not just the one defined in 'project'.).",
         envvar="DB_BACKUP_GLOBAL",
+        show_envvar=True,
         is_flag=True,
         default=False,
     )
@@ -109,6 +117,7 @@ def global_option():
     "schedule",
     help="Cron schedule (https://crontab.guru), per default it runs at 2am every day.",
     envvar="DB_BACKUP_CRON",
+    show_envvar=True,
     show_default=True,
     default="0 2 * * *",
 )
@@ -118,6 +127,7 @@ def global_option():
     is_flag=True,
     help="Run backup on startup as well.",
     envvar="ON_STARTUP",
+    show_envvar=True,
     type=bool,
 )
 @compression_option()

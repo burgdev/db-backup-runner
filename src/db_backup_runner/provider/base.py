@@ -13,27 +13,47 @@ from db_backup_runner.types import CompressionAlgorithm
 
 
 class BackupProviderBase:
+    """Base BackupProvider class"""
+
     name: str = None  # type: ignore
+    """Backup provider name (e.g. postgres)"""
     default_dump_binary: str | None = None
+    """Default dump binary"""
     default_dump_args: str | None = None
+    """Default dump binary arguments"""
     default_restore_binary: str | None = "RESTORE_COMMAND"
+    """Default restore binary"""
     default_restore_args: str | None = ""
+    """Default restore binary arguments"""
     min_file_size: int = 200
+    """Maximum file size, used to validate the generated file"""
     pattern: str | None = None
+    """Pattern which is checked in the dumped file"""
     plain_file_extension: str = ".sql"
+    """File extenstion used for the dumped file"""
 
     def __init__(
         self, container: Container, compression: CompressionAlgorithm | None = None
     ):
-        self.compression = compression
+        """Backup provider constructor
+
+        Args:
+          container: Container object
+          compression: Compression algorithm
+        """
+        self.compression: CompressionAlgorithm | None = compression
+        """Compression algorithm"""
         if self.name is None:
             raise AttributeError("Add 'name' to your BackupProvider.")
-        self.container = container
+        self.container: Container = container
+        """Container object"""
 
     def dump(self) -> str:
+        """Dump database"""
         raise NotImplementedError("Dump method must be implemented by subclass")
 
     def restore(self, backup_file: Path) -> None:
+        """Restore database"""
         service_name = self.get_service_name()
         dump_file = f"/tmp/db{self.plain_file_extension}"
         if service_name:
@@ -73,6 +93,7 @@ class BackupProviderBase:
         click.echo("")
 
     def is_backup_provider(self) -> bool:
+        """Checks if container supports a backup provider"""
         provider_name = self.get_container_label("backup_provider")
         if provider_name and provider_name == self.name:
             return True
@@ -83,6 +104,7 @@ class BackupProviderBase:
         return False
 
     def validate_file(self, file_path: Path) -> bool:
+        """Validate the generated file"""
         min_file_size = int(
             self.get_container_label("min_file_size") or self.min_file_size
         )
@@ -114,7 +136,14 @@ class BackupProviderBase:
     def trigger_webhook(
         self, message: str, address: str, code: int = 0, append: str = ""
     ) -> None:
-        """A code of '0' means success."""
+        """Trigger webhook.
+
+        Args:
+          message: Message send to the webhook
+          address: If not set taken from the label
+          code: Code which is sent to the webhook
+          append: Path appended to address (can be used for fails)
+        """
         address = self.get_container_label("webhook") or address
         if address.lower() == "none":
             logger.debug(f"Webhook address is disabled for '{self.container.name}'.")
@@ -133,13 +162,14 @@ class BackupProviderBase:
                     "message": message,
                     "container": self.container.name,
                     "provider": self.name,
-                    "code": 0,
+                    "code": code,
                 },
             )
         except requests.RequestException as e:
             logger.error(f"Failed to call webhook: {e}")
 
     def trigger_error_webhook(self, message: str, address: str, code: int = 1) -> None:
+        """Triggers an error on the webhook. `code` is appended to the address."""
         self.trigger_webhook(
             message=message, address=f"{address}", code=code, append=str(code)
         )
@@ -147,32 +177,40 @@ class BackupProviderBase:
     def trigger_success_webhook(
         self, message: str, address: str, code: int = 0
     ) -> None:
+        """Triggers an success on the webhook."""
         self.trigger_webhook(message=message, address=f"{address}", code=code)
 
     def get_dump_binary(self) -> str:
+        """Get the binary used to dump the backup."""
         return self.get_container_label("dump_binary", self.default_dump_binary) or ""
 
     def get_dump_args(self) -> str:
+        """Arguments for the dump binary."""
         return self.get_container_label("dump_args", self.default_dump_args) or ""
 
     def get_restore_binary(self) -> str:
+        """Get the binary used to restore the backup."""
         return (
             self.get_container_label("restore_binary", self.default_restore_binary)
             or ""
         )
 
     def get_restore_args(self) -> str:
+        """Arguments for the restore binary."""
         return self.get_container_label("restore_args", self.default_restore_args) or ""
 
     def get_container_env(self) -> dict[str, str | None]:
+        """Get environment variables from container."""
         _, (env_output, _) = self.container.exec_run("env", demux=True)
         return dict(dotenv_values(stream=StringIO(env_output.decode())))
 
     def binary_exists_in_container(self, binary_name: str) -> bool:
+        """Check if binary exists inside the container."""
         exit_code, _ = self.container.exec_run(["which", binary_name])
         return exit_code == 0
 
     def get_container_label(self, label: str, default: str | None = None) -> str | None:
+        """Get labels for container."""
         labels = self.container.labels or {}
         for key, value in labels.items():
             full_label = "db-backup-runner." + label
@@ -181,5 +219,6 @@ class BackupProviderBase:
         return default
 
     def get_service_name(self) -> str:
+        """Get service name (only if started with docker compose)."""
         labels = self.container.labels or {}
         return labels.get("com.docker.compose.service", "")

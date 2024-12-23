@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2024-12-14
 
-### 🚀 Features
+#### 🚀 Features
 
 - Restore script improvements ([#2](https://github.com/burgdev/db-backup-runner/pull/2))
 - Add command to automatically create a restore script ([#1](https://github.com/burgdev/db-backup-runner/pull/1))

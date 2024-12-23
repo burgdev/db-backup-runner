@@ -5,6 +5,14 @@ from db_backup_runner.provider.postgres import PostgresBackupProvider
 from db_backup_runner.provider.redis import RedisBackupProvider
 
 
+__all__ = [
+    "BackupProviderBase",
+    "MariaDbBackupProvider",
+    "MySQLBackupProvider",
+    "PostgresBackupProvider",
+    "RedisBackupProvider",
+]
+
 BACKUP_PROVIDERS = [
     MariaDbBackupProvider,
     MySQLBackupProvider,
