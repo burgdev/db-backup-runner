@@ -6,8 +6,10 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml
+        args: [--unsafe]
       - id: end-of-file-fixer
       - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.8.2"
@@ -20,3 +22,4 @@ repos:
     rev: "v3.0.3"
     hooks:
       - id: prettier
+        types_or: [css, javascript, json, scss, yaml]

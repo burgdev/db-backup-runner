@@ -1,3 +1,5 @@
+"""Main module which manages the backups and restore functions"""
+
 import secrets
 from loguru import logger
 from docker.errors import DockerException
@@ -24,6 +26,8 @@ from db_backup_runner.types import CompressionAlgorithm
 
 
 class BackupManager:
+    """Manages the backups and restore functions"""
+
     BACKUP_PROVIDERS: list[type[BackupProviderBase]] = BACKUP_PROVIDERS
 
     def __init__(
@@ -248,7 +252,7 @@ if __name__ == "__main__":
     # Configure logger to use a custom format
     logger.remove()  # Remove the default handler
     logger.add(sys.stdout, format="<level>{level}: {message}</level>", level="DEBUG")
-    manager = BackupManager()
+    _manager = BackupManager()
     if os.environ.get("DB_BACKUP_CRON"):
         logger.info(
             f"Running backup with schedule '{os.environ.get('DB_BACKUP_CRON')}'."
@@ -260,6 +264,6 @@ if __name__ == "__main__":
                 "Usage: python script.py restore <container_name> <backup_file>"
             )
         else:
-            manager.restore(sys.argv[2], Path(sys.argv[3]))
+            _manager.restore(sys.argv[2], Path(sys.argv[3]))
     else:
-        manager.backup(datetime.now())
+        _manager.backup(datetime.now())

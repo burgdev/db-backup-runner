@@ -1,3 +1,5 @@
+"""Command line interface, see also [cli help](/db-backup-runner/cli)."""
+
 from pathlib import Path
 from loguru import logger
 import click
@@ -36,7 +38,7 @@ def cli(verbose):
     logger.trace("Setup logging with trace level.")
 
 
-def compression_option():
+def _compression_option():
     return click.option(
         "-c",
         "--compression",
@@ -49,7 +51,7 @@ def compression_option():
     )
 
 
-def backup_dir_option():
+def _backup_dir_option():
     return click.option(
         "-b",
         "--backup-dir",
@@ -61,7 +63,7 @@ def backup_dir_option():
     )
 
 
-def use_timestamp_option():
+def _use_timestamp_option():
     return click.option(
         "-t",
         "--use-timestamp",
@@ -73,7 +75,7 @@ def use_timestamp_option():
     )
 
 
-def webhook_option():
+def _webhook_option():
     return click.option(
         "-w",
         "--webhook",
@@ -85,7 +87,7 @@ def webhook_option():
     )
 
 
-def project_name_option():
+def _project_name_option():
     return click.option(
         "-p",
         "--project",
@@ -97,7 +99,7 @@ def project_name_option():
     )
 
 
-def global_option():
+def _global_option():
     return click.option(
         "-g",
         "--global",
@@ -130,12 +132,12 @@ def global_option():
     show_envvar=True,
     type=bool,
 )
-@compression_option()
-@project_name_option()
-@backup_dir_option()
-@use_timestamp_option()
-@webhook_option()
-@global_option()
+@_compression_option()
+@_project_name_option()
+@_backup_dir_option()
+@_use_timestamp_option()
+@_webhook_option()
+@_global_option()
 def backup_cron(schedule, on_startup, backup_dir, **kwargs):
     "Run backup based on the schedule."
     manager = BackupManager(backup_dir=Path(backup_dir), **kwargs)
@@ -148,12 +150,12 @@ def backup_cron(schedule, on_startup, backup_dir, **kwargs):
 
 
 @cli.command()
-@compression_option()
-@project_name_option()
-@backup_dir_option()
-@use_timestamp_option()
-@webhook_option()
-@global_option()
+@_compression_option()
+@_project_name_option()
+@_backup_dir_option()
+@_use_timestamp_option()
+@_webhook_option()
+@_global_option()
 def backup(backup_dir, **kwargs):
     "Run a manual backup."
     manager = BackupManager(
@@ -164,7 +166,7 @@ def backup(backup_dir, **kwargs):
 
 
 @cli.command()
-@project_name_option()
+@_project_name_option()
 @click.option(
     "-t",
     "--target",

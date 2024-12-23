@@ -1,4 +1,4 @@
-from db_backup_runner.provider.mariadb import MariaDbBackupProvider
+from db_backup_runner.provider._mariadb import MariaDbBackupProvider
 
 
 class MySQLBackupProvider(MariaDbBackupProvider):

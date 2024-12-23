@@ -1,3 +1,5 @@
+"""Type definitions"""
+
 from typing import Literal
 
 
