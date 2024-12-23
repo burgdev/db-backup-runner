@@ -9,6 +9,12 @@ import project
 import changelog
 
 
+@task
+def help(c: Ctx):
+    """Show this help"""
+    c.run("inv --list", pty=True)
+
+
 ns = Collection(
     project.install,
     project.release,
@@ -16,7 +22,8 @@ ns = Collection(
     project.update_venv,
     check,
     docker,
-    changelog,
+    changelog.changelog,
+    help,
 )
 
 

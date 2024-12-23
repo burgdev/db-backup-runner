@@ -83,7 +83,7 @@ def release(
 
 @task(help={"next": "Show next version"})
 def version(c: Ctx, next: bool = False):
-    """Print current or next (--next) project version."""
+    """Print current or next (--next) project version"""
     version = "unknown"
     # adopt path to your pyproject.toml
     pyproject_toml_file = Path(__file__).parent.parent / "pyproject.toml"
