@@ -1,10 +1,73 @@
 from tasks import info, error, success, warning, echo, env, task, header, Ctx, EnvError  # noqa: F401
 
+import re
+import sys
 
-@task(default=True)
-def entry(c: Ctx, latest: bool = False):
-    scope = "--latest" if latest else "--current"
-    entry = c.run(
-        f"git-cliff {scope} --strip all | tail -n +2", hide=True
-    ).stdout.strip()
-    echo(entry)
+from typing import Literal
+
+
+@task(
+    default=True,
+    help={
+        "latest": "Get the latest, not published entries. Overwrites --version",
+        "version": "Version to extract, either number or 'current' for the current version",
+        "plain": "Do not print headers or warnings",
+    },
+)
+def changelog(
+    c: Ctx,
+    latest: bool = False,
+    version: str | Literal["current", "latest"] = "current",
+    plain: bool = False,
+):
+    """Get changelog entries for a specific version"""
+    if version == "latest" or latest:
+        # get it from current PRs, not in CHANGELOG yet.
+        content = c.run(
+            "git-cliff --latest --strip all | tail -n +2", hide=True
+        ).stdout.strip()
+        bumped_version = (
+            c.run("git cliff --bumped-version", hide=True)
+            .stdout.strip()
+            .replace("v", "")
+        )
+        captured_version = f"latest: {bumped_version}"
+    else:
+        input_file = "CHANGELOG.md"
+
+        try:
+            with open(input_file, "r") as file:
+                lines = file.readlines()
+        except FileNotFoundError:
+            error(f"File {input_file} not found.")
+        except Exception as e:
+            error(f"An error occurred: {e}")
+
+        # Initialize variables to capture the desired section
+        capture = False
+        extracted_content = []
+        if version == "current":
+            version_header_pattern = r"## \[(.*)\]\s+.*"
+        else:
+            version_header_pattern = rf"## \[({version})\]\s+.*"
+
+        for line in lines:
+            match = re.match(version_header_pattern, line)
+            if match:
+                captured_version = match.group(1)
+                capture = True
+                continue
+
+            if capture:
+                # Stop capturing if the next version is reached
+                if re.match(rf"^\[{captured_version}]", line):
+                    break
+                extracted_content.append(line)
+        content = "".join(extracted_content).strip().strip("\n")
+    if not content:
+        warning(f"Nothing found for '{version}'") if not plain else None
+        sys.exit(1)
+    else:
+        header(f"Changelog for '{captured_version}'") if not plain else None
+        echo(content)
+        header() if not plain else None
