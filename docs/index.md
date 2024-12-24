@@ -1,24 +1,34 @@
+
+![Image title](assets/favicon.png){ width=140, align=right }
 # DB Backup Runner
 
-Runs a container with a Python script which makes updates from other (database) containers.
+**DB Backup Runner** is used to backup any database from other containers.
+Since it uses the backup tool (e.g. `pgdump`) from inside the database container it is
+easy to add support for many databases.
 
-The [container](https://ghcr.io/burgdev/db-backup-runner) needs the `db-backup-runner.enable` label to be set to `true` for the backup.
+The script can also make backups from multiple containers and is configured with _labels_.
 
-Here is a _docker-compose.yml_ file with two databases and one backup container.
+!!! note
+    It works best together with `docker compose`, although it should work with docker alone,
+    but at the moment it is only tested with `docker compose`.
 
-```yaml
+Each database which needs a backup need the `db-backup-runner.enable=true` label, as shown in the following
+docker compose configuration file:
+
+
+```yaml title="Example docker compose fil with two databases and a backup runner container"
 services:
-  # Backup container
-  db-backup:
-    image: ghcr.io/burgdev/db-backup-runner:next-alpine # (~60MB)
+  db-backup:  # Backup container
+    image: ghcr.io/burgdev/db-backup-runner:next-alpine # (1)!
     restart: unless-stopped
     container_name: docker-db-auto-backup
-    command: "backup-cron --on-startup" # optional
+    command: "backup-cron --on-startup" # optional (2)
     environment:
-      DB_BACKUP_CRON: "0 4 * * *" # https://crontab.guru
+      DB_BACKUP_CRON: "0 4 * * *" # (3)!
+      WEBHOOK: "https://my-webhook.io/myapp"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
-      - ./backups:/tmp/db_backup_runner # backup directory
+      - ./backups:/tmp/db_backup_runner # required, backup directory
 
   app:
     image: myapp:latest
@@ -35,7 +45,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: app_db
-    labels:
+    labels: # (4)!
       - "db-backup-runner.enable=true"
       # optional
       - `db-backup-runner.dump_args=-Ft`
@@ -46,40 +56,86 @@ services:
       - "db-backup-runner.enable=true"
       # optional
       - "db-backup-runner.backup_provider=redis"
-      - "db-backup-runner.webhook=none" # disable global webhook for thos container
+      - "db-backup-runner.webhook=none" # disable global webhook for this container
 ```
 
+1. Backup [container](https://ghcr.io/burgdev/db-backup-runner) (~60MB), responsible to run a cron jobs which runs the backups
+2. The `command` is only used if additional arguments are needed. The subcommand (in this case `backup-cron`) is required.
+   It is also possible to use environment variables instead.
+3. Schedule the backups, use cron [syntax](https://crontab.guru).
+4. Labels are used to configure the backup for each container. Only the `db-backup-runner.enable=true` is required.
+
 The backup container runs a cron job which backs up all container which are enabled and have a
-backup provider. At the moment the following providers are supported:
+backup provider.
+
+At the moment the following providers are supported:
 
 - Postgres (`db_dump`)
+
+!!! warning
+    Only postgres is tested at the moment, the others might not work yet!
+
 - MariaDB (`mariadb-dump`)
 - MySQL (`mysqldump`)
 - Redis (`redis-cli`)
 
 But it is easy to create additional providers and mount them into the backup container
-(`./custom:/app/src/db_backup_runner/custom`). The custom backup providers are loaded first, this means you can overwrite existing providers (same name) or add new ones (different name).
+(`./custom:/app/src/db_backup_runner/custom`), [see `custom.provider`](reference/db_backup_runner/custom/provider#db_backup_runner.custom.provider).
+The custom backup providers are loaded first, this means you can overwrite existing providers (same name) or add new ones (different name).
+
+## Command Arguments
+
+This are the possible command arguments (or environment variables).
+
+::: mkdocs-click
+  :module: db_backup_runner.cli
+  :command: backup_cron
+  :prog_name: backup-cron
+  :depth: 3
+  :style: plain
+
+The other `db-backup-runner` subcommands are documented [here](cli.md).
 
 ## Labels
 
-- `db-backup-runner.enable=true|false`: Enabled or disable backup (**required**)
+Labels are used to control each containers backup.
 
-All other labels are optional and usually nor needed:
+#### Required
 
-- `db-backup-runner.backup_provider=postres|mysql|mariadb|readis|...`: Provider, only needed if it cannot figure it out.
-- `db-backup-runner.dump_binary=<custom binary name or path>`: If the default command doesn't work.
-- `db-backup-runner.dump_args=<additional args>`: Additional arguments for the `dump` command.
-- `db-backup-runner.min_file_size=<number>`: A sanity check is done for the file size, this can be changed per container (default: 200)
-- `db-backup-runner.webhook=<custom webhook address>|none`: If one container should use a different webhook address or don't use it at all.
+`db-backup-runner.enable = true|false`
+:   Enabled or disable backup
 
-## Configuration
+#### Optional
 
-### Postgres
+`db-backup-runner.backup_provider = postres|mysql|mariadb|readis|...`
+:   Provider, only needed if it cannot figure it out.
 
-- `dump_binary`: `pg_dump`, change this to use e.g. `pg_dumpall`.
-- `dump_args`: `-Fc -U USER`, remove it if `pg_dumpall` is used, which only supports `sql`.
-- `restore_binary`: `pg_restore`
-- `restore_args`: `-Fc -U USER -d DATABSE`
+`db-backup-runner.dump_binary = <custom binary name or path>`
+:   If the default command doesn't work.
+
+`db-backup-runner.dump_args = <additional args>`
+:   Additional arguments for the `dump` command.
+
+`db-backup-runner.min_file_size = <number>`
+:   A sanity check is done for the file size, this can be changed per container (default: 200)
+
+`db-backup-runner.webhook = <custom webhook address>|none`
+:   If one container should use a different webhook address or don't use it at all.
+
+### Defaults
+
+The default values are described in the API reference:
+
+* [Postgres](reference/db_backup_runner/provider/#db_backup_runner.provider.PostgresBackupProvider-attributes)
+
+!!! warning
+    Only postgres is tested at the moment, the others might not work yet!
+
+
+* [MySQL](reference/db_backup_runner/provider/#db_backup_runner.provider.MySQLBackupProvider-attributes)
+* [MariaDB](reference/db_backup_runner/provider/#db_backup_runner.provider.MariaDbBackupProvider-attributes)
+* [Redis](reference/db_backup_runner/provider/#db_backup_runner.provider.RedisBackupProvider-attributes)
+
 
 ## Restore
 

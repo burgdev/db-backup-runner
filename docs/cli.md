@@ -1,4 +1,4 @@
-# CLI
+# Command Line Interface
 
 A command line interface is used to backup and restore the databases.
 For a one time backup the [`backup`](#db-backup-runner-backup) subcommand is used,
