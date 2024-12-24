@@ -1,4 +1,34 @@
+![Image title](docs/assets/favicon.png)
+
+### **[Documentation](burgdev.github.io/db-backup-runner/)** | [Packages](https://ghcr.io/burgdev/db-backup-runner)
+
+
 # DB Backup Runner
+
+
+**DB Backup Runner** is used to backup any database from other containers.
+Since it uses the backup tool (e.g. `pgdump`) from inside the database container it is
+easy to add support for many databases.
+
+The script can also make backups from multiple containers and is configured with _labels_.
+
+!!! note
+    It works best together with `docker compose`, although it should work with docker alone,
+    but at the moment it is only tested with `docker compose`.
+
+Each database which needs a backup need the `db-backup-runner.enable=true` label, as shown in the following
+docker compose configuration file:
+
+
+
+
+
+
+
+
+
+
+
 
 Runs a container with a Python script which makes updates from other (database) containers.
 
