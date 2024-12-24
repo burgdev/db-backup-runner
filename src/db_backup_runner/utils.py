@@ -1,3 +1,5 @@
+"""Utility functions"""
+
 import bz2
 import gzip
 import lzma

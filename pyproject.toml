@@ -19,11 +19,19 @@ registry = "ghcr.io/burgdev"
 
 [dependency-groups]
 dev = [
+  "black>=24.10.0",
   "deptry>=0.21.1",
   "environs>=11.2.1",
   "git-cliff>=2.7.0",
   "humanize>=4.11.0",
   "invoke>=2.2.0",
+  "mkdocs-click>=0.8.1",
+  "mkdocs-gen-files>=0.5.0",
+  "mkdocs-literate-nav>=0.6.1",
+  "mkdocs-material>=9.5.49",
+  "mkdocs-open-in-new-tab>=1.0.8",
+  "mkdocs-section-index>=0.3.9",
+  "mkdocstrings[python]>=0.27.0",
   "pre-commit>=4.0.1",
   "pyright>=1.1",
   "pytest>=8.3.4",
@@ -63,95 +71,10 @@ DEP004 = [
   "environs",
   "humanize",
   "python_on_whales",
+  "mkdocs_gen_files",
 ] # only in dev
 DEP003 = ["db_backup_runner"] # transitive dependencies
 #DEP002 = ["types-xmltodict", "types-python-slugify"] # not used
-
-# git-cliff settings
-# https://git-cliff.org
-
-#[tool.git-cliff.bump]
-#initial_tag = "v0.1.1"
-#
-#[tool.git-cliff.remote.github]
-#owner = "burgdev"
-#repo = "db-backup-runner"
-#
-#[tool.git-cliff.git]
-#tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+"
-#sort_commits = "newest"
-#conventional_commits = false
-#filter_unconventional = false
-##topo_order = true
-#commit_parsers = [
-#  { field = "github.pr_labels", pattern = "release:breaking", group = "🏗️ Breaking changes" },
-#  { field = "github.pr_labels", pattern = "type:feature", group = "🚀 Features" },
-#  { field = "github.pr_labels", pattern = "type:bug", group = "🐛 Fixes" },
-#  { field = "github.pr_labels", pattern = "type:refactor", group = "🏭 Refactor" },
-#  { field = "github.pr_labels", pattern = "type:docu", group = "📝 Documentation" },
-#  { field = "github.pr_labels", pattern = "type:update", group = "🧪 Dependencies" },
-#  { field = "github.pr_labels", pattern = "type:others", group = "🌀 Miscellaneous" },
-#  #{ field = "github.pr_labels", pattern = "type:tooling", group = "🌀 Miscellaneous", default_scope = "Tooling" },
-#  { field = "github.pr_labels", pattern = ".*", skip = true },
-#]
-#
-## remove last added merged requests, they are added below again (with url).
-#commit_preprocessors = [{ pattern = '\.?\s*\(#[0-9]+\)$', replace = "" }]
-#
-#[tool.git-cliff.changelog]
-## template for the changelog header
-## https://keats.github.io/tera/docs/#introduction
-#header = """
-## Changelog\n
-#All notable changes to this project will be documented in this file.
-#
-#The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-#and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n
-#"""
-#body = """
-#{%- macro remote_url() -%}
-#  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
-#{%- endmacro -%}
-#
-#{% if version -%}
-#    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
-#{% else -%}
-#    ## [Unreleased]
-#{% endif -%}
-#
-#{% for group, commits in commits | group_by(attribute="group") %}
-#    ### {{ group | upper_first }}
-#    {%- for commit in commits %}
-#        - {{ commit.remote.pr_title | split(pat="\n") | first | upper_first | trim }}\
-#            {% if commit.remote.pr_number %}\
-#            {# #} ([#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }})) \
-#            {%- endif -%}
-#    {% endfor %}
-#{% endfor %}
-#{# #}\n
-#"""
-#footer = """
-#{%- macro remote_url() -%}
-#  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
-#{%- endmacro -%}
-#
-#{% for release in releases -%}
-#    {% if release.version -%}
-#        {% if release.previous.version -%}
-#            [{{ release.version | trim_start_matches(pat="v") }}]: \
-#
-#                {{ self::remote_url() }}/compare/{{ release.previous.version }}..{{ release.version }}
-#        {% endif -%}
-#    {% else -%}
-#        [unreleased]: {{ self::remote_url() }}/compare/{{ release.previous.version }}..HEAD
-#    {% endif -%}
-#{% endfor %}
-#[0.1.1]: {{ self::remote_url() }}/releases/tag/v0.1.1
-#
-#"""
-## remove the leading and trailing whitespace from the templates
-#trim = true
-#
 
 [build-system]
 requires = ["hatchling"]

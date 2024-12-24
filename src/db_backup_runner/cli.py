@@ -1,3 +1,5 @@
+"""Command line interface, see also [cli help](/db-backup-runner/cli)."""
+
 from pathlib import Path
 from loguru import logger
 import click
@@ -16,8 +18,10 @@ from db_backup_runner.utils import DEFAULT_BACKUP_DIR, compression_algorithms
     count=True,
     help="Enable verbose output.",
     envvar="DB_BACKUP_VERBOSE",
+    show_envvar=True,
 )
 def cli(verbose):
+    "Main command to backup and restore databases."
     # Configure logger to use a custom format
     logger.remove()  # Remove the default handler
     log_level = "INFO"
@@ -34,7 +38,7 @@ def cli(verbose):
     logger.trace("Setup logging with trace level.")
 
 
-def compression_option():
+def _compression_option():
     return click.option(
         "-c",
         "--compression",
@@ -42,61 +46,67 @@ def compression_option():
         envvar="COMPRESSION",
         type=click.Choice(compression_algorithms),
         show_default=True,
+        show_envvar=True,
         default="plain",
     )
 
 
-def backup_dir_option():
+def _backup_dir_option():
     return click.option(
         "-b",
         "--backup-dir",
         help="Backup directory.",
         envvar="BACKUP_DIR",
         show_default=True,
+        show_envvar=True,
         default=DEFAULT_BACKUP_DIR,
     )
 
 
-def use_timestamp_option():
+def _use_timestamp_option():
     return click.option(
         "-t",
         "--use-timestamp",
         help="Add a timestamp to the backup filename.",
         envvar="USE_TIMESTAMP",
+        show_envvar=True,
         is_flag=True,
         show_default=True,
     )
 
 
-def webhook_option():
+def _webhook_option():
     return click.option(
         "-w",
         "--webhook",
         "webhook_url",
         help="Heartbeat webhook address.",
         envvar="WEBHOOK",
+        show_envvar=True,
         default="",
     )
 
 
-def project_name_option():
+def _project_name_option():
     return click.option(
         "-p",
         "--project",
         "project_name",
         help="Project name, used if it is not started with docker compose.",
         envvar="DB_BACKUP_PROJECT_NAME",
+        show_envvar=True,
         default="",
     )
 
 
-def global_option():
+def _global_option():
     return click.option(
         "-g",
         "--global",
         "global_mode",
         help="Run in global mode, backup any container (e.g. not just the one defined in 'project'.).",
         envvar="DB_BACKUP_GLOBAL",
+        show_envvar=True,
         is_flag=True,
         default=False,
     )
@@ -109,6 +119,7 @@ def global_option():
     "schedule",
     help="Cron schedule (https://crontab.guru), per default it runs at 2am every day.",
     envvar="DB_BACKUP_CRON",
+    show_envvar=True,
     show_default=True,
     default="0 2 * * *",
 )
@@ -118,14 +129,15 @@ def global_option():
     is_flag=True,
     help="Run backup on startup as well.",
     envvar="ON_STARTUP",
+    show_envvar=True,
     type=bool,
 )
-@compression_option()
-@project_name_option()
-@backup_dir_option()
-@use_timestamp_option()
-@webhook_option()
-@global_option()
+@_compression_option()
+@_project_name_option()
+@_backup_dir_option()
+@_use_timestamp_option()
+@_webhook_option()
+@_global_option()
 def backup_cron(schedule, on_startup, backup_dir, **kwargs):
     "Run backup based on the schedule."
     manager = BackupManager(backup_dir=Path(backup_dir), **kwargs)
@@ -138,12 +150,12 @@ def backup_cron(schedule, on_startup, backup_dir, **kwargs):
 
 
 @cli.command()
-@compression_option()
-@project_name_option()
-@backup_dir_option()
-@use_timestamp_option()
-@webhook_option()
-@global_option()
+@_compression_option()
+@_project_name_option()
+@_backup_dir_option()
+@_use_timestamp_option()
+@_webhook_option()
+@_global_option()
 def backup(backup_dir, **kwargs):
     "Run a manual backup."
     manager = BackupManager(
@@ -154,7 +166,7 @@ def backup(backup_dir, **kwargs):
 
 
 @cli.command()
-@project_name_option()
+@_project_name_option()
 @click.option(
     "-t",
     "--target",
