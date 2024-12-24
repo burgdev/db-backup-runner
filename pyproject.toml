@@ -19,6 +19,7 @@ registry = "ghcr.io/burgdev"
 
 [dependency-groups]
 dev = [
+  "black>=24.10.0",
   "deptry>=0.21.1",
   "environs>=11.2.1",
   "git-cliff>=2.7.0",
