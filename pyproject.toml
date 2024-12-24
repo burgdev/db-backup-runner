@@ -20,6 +20,7 @@ registry = "ghcr.io/burgdev"
 [dependency-groups]
 dev = [
   "black>=24.10.0",
+  "bump2version>=1.0.1",
   "deptry>=0.21.1",
   "environs>=11.2.1",
   "git-cliff>=2.7.0",
@@ -52,6 +53,16 @@ python-cron = { git = "https://github.com/whdev1/pycron", rev = "e40f465940f1632
 
 [project.scripts]
 db-backup-runner = "db_backup_runner:cli"
+
+[tool.bumpversion]
+current_version = "0.1.1"
+commit = false
+tag = false
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]

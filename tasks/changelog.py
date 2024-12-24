@@ -16,15 +16,15 @@ from typing import Literal
 )
 def changelog(
     c: Ctx,
-    latest: bool = False,
-    version: str | Literal["current", "latest"] = "current",
+    unreleased: bool = False,
+    version: str | Literal["current", "unreleased"] = "current",
     plain: bool = False,
 ):
     """Get changelog entries for a specific version"""
-    if version == "latest" or latest:
+    if version == "unreleased" or unreleased:
         # get it from current PRs, not in CHANGELOG yet.
         content = c.run(
-            "git-cliff --latest --strip all | tail -n +2", hide=True
+            "git-cliff --unreleased --bump --strip all | tail -n +2", hide=True
         ).stdout.strip()
         bumped_version = (
             c.run("git cliff --bumped-version", hide=True)
@@ -53,14 +53,14 @@ def changelog(
 
         for line in lines:
             match = re.match(version_header_pattern, line)
-            if match:
+            if match and not capture:
                 captured_version = match.group(1)
                 capture = True
                 continue
 
             if capture:
                 # Stop capturing if the next version is reached
-                if re.match(rf"^\[{captured_version}]", line):
+                if re.match(r"^## \[.*\].*", line):
                     break
                 extracted_content.append(line)
         content = "".join(extracted_content).strip().strip("\n")

@@ -52,10 +52,14 @@ def release(
     if dry:
         unreleased = unreleased if length < 0 else False
         length = 0 if (not unreleased and length < 0) else length
-        echo("Show only 'unreleased' changes") if unreleased else (
-            echo(f"Show {length} lines of changelog")
-            if length > 0
-            else echo("Show full changelog")
+        (
+            echo("Show only 'unreleased' changes")
+            if unreleased
+            else (
+                echo(f"Show {length} lines of changelog")
+                if length > 0
+                else echo("Show full changelog")
+            )
         )
         header("Changelog start") if dry else None
         cl = (
@@ -70,6 +74,7 @@ def release(
         header("Changelog end") if dry else None
     else:
         cl = c.run("git-cliff --bump -o", hide=True).stdout.strip().split("\n")
+
         # only prepend new tag -- this way it is possible to edit it.
         # cl = c.run(f"git-cliff --bump {'--prepend CHANGELOG.md' if dry else '-o'}", hide=True).stdout.strip().split("\n")
     if new_tag:
