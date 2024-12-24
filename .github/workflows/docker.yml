@@ -57,6 +57,16 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+
+      - name: Generate tag for Docker image
+        id: generate-tag
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "TAG=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ github.event.client_payload.version }}" >> $GITHUB_ENV
+          fi
+
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`.
       # If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
@@ -66,7 +76,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: "${{ github.event_name == 'push' ? steps.meta.outputs.tags : github.event.client_payload.version }}"
+          tags: ${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
 
       ## not included at the moment
