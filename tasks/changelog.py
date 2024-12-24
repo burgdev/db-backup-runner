@@ -9,7 +9,7 @@ from typing import Literal
 @task(
     default=True,
     help={
-        "latest": "Get the latest, not published entries. Overwrites --version",
+        "unreleased": "Get the unreleased, not published entries. Overwrites --version",
         "version": "Version to extract, either number or 'current' for the current version",
         "plain": "Do not print headers or warnings",
     },
