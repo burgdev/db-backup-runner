@@ -28,6 +28,7 @@ jobs:
 
       - name: Check if tag exists
         uses: mukunku/tag-exists-action@v1.6.0
+        id: check-tag
         with:
           tag: "v${{ env.version }}"
 
