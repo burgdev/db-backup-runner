@@ -49,13 +49,18 @@ def release(
 ):
     """Prepare a release, update CHANGELOG file and bump versions"""
     new_tag = c.run("git-cliff --bumped-version", hide=True).stdout.strip()
+    new_version = new_tag.replace("v", "")
     if dry:
         unreleased = unreleased if length < 0 else False
         length = 0 if (not unreleased and length < 0) else length
-        echo("Show only 'unreleased' changes") if unreleased else (
-            echo(f"Show {length} lines of changelog")
-            if length > 0
-            else echo("Show full changelog")
+        (
+            echo("Show only 'unreleased' changes")
+            if unreleased
+            else (
+                echo(f"Show {length} lines of changelog")
+                if length > 0
+                else echo("Show full changelog")
+            )
         )
         header("Changelog start") if dry else None
         cl = (
@@ -70,10 +75,12 @@ def release(
         header("Changelog end") if dry else None
     else:
         cl = c.run("git-cliff --bump -o", hide=True).stdout.strip().split("\n")
+        c.run(f"bump2version --new-version {new_version} patch")
+
         # only prepend new tag -- this way it is possible to edit it.
         # cl = c.run(f"git-cliff --bump {'--prepend CHANGELOG.md' if dry else '-o'}", hide=True).stdout.strip().split("\n")
     if new_tag:
-        success(f"Bumped to version '{new_tag}'.")
+        success(f"Bumped to version '{new_version}' (tag '{new_tag}').")
         if add_tag and not dry:
             c.run(f"git tag -f '{new_tag}'")
             c.run(f"git push origin '{new_tag}'")
