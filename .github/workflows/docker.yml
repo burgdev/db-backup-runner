@@ -49,17 +49,12 @@ jobs:
           else
             VERSION=""
           fi
-          if [ -n "$VERSION" ]; then
-            MAJOR=$(echo $VERSION | cut -d. -f1)
-            MINOR=$(echo $VERSION | cut -d. -f1-2)
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-            echo "VERSION_MINOR=$MAJOR.$MINOR" >> $GITHUB_ENV
-            echo "VERSION_MAJOR=$MAJOR" >> $GITHUB_ENV
-          else
-            echo "VERSION=" >> $GITHUB_ENV
-            echo "VERSION_MINOR=" >> $GITHUB_ENV
-            echo "VERSION_MAJOR=" >> $GITHUB_ENV
-          fi
+
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f1-2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION_MINOR=$MINOR" >> $GITHUB_ENV
+          echo "VERSION_MAJOR=$MAJOR" >> $GITHUB_ENV
 
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about)
       # to extract tags and labels that will be applied to the specified image.
