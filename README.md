@@ -6,7 +6,7 @@
     <em>Backup multiple database containers from one backup runner container.</em>
 </p>
 <p align="center">
-    <b><a href="https://burgdev.github.io/db-backup-runner/getting-started/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
+    <b><a href="https://burgdev.github.io/db-backup-runner/docu/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
 </p>
 
 ---
@@ -20,7 +20,7 @@ The script can also make backups from multiple containers and is configured with
 **NOTE:** It works best together with `docker compose`, although it should work with docker alone,
           but at the moment it is only tested with `docker compose`.
 
-For more information check out the [**documentation**](https://burgdev.github.io/db-backup-runner/).
+For more information check out the [**documentation**](https://burgdev.github.io/db-backup-runner/docu/).
 
 
 ### Credits
