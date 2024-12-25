@@ -38,6 +38,29 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine version
+        id: determine-version
+        run: |
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            VERSION=${{ github.event.client_payload.version }}
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION=${{ github.ref_name }}
+          else
+            VERSION=""
+          fi
+          if [ -n "$VERSION" ]; then
+            MAJOR=$(echo $VERSION | cut -d. -f1)
+            MINOR=$(echo $VERSION | cut -d. -f1-2)
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "VERSION_MINOR=$MAJOR.$MINOR" >> $GITHUB_ENV
+            echo "VERSION_MAJOR=$MAJOR" >> $GITHUB_ENV
+          else
+            echo "VERSION=" >> $GITHUB_ENV
+            echo "VERSION_MINOR=" >> $GITHUB_ENV
+            echo "VERSION_MAJOR=" >> $GITHUB_ENV
+          fi
+
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about)
       # to extract tags and labels that will be applied to the specified image.
       # The `id` "meta" allows the output of this step to be referenced in a subsequent step.
@@ -53,19 +76,15 @@ jobs:
             type=edge,pattern=develop
             # Use a custom tag if manually dispatched
             type=raw,value=${{ github.event.inputs.custom_tag || '' }}
-            # Semantic version tags
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
 
-      - name: Generate tag for Docker image
-        id: generate-tag
-        run: |
-          if [ "${{ github.event_name }}" == "push" ]; then
-            echo "TAG=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
-          else
-            echo "TAG=${{ github.event.client_payload.version }}" >> $GITHUB_ENV
-          fi
+            # Use the semantic version if provided explicitly
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=${{ env.VERSION_MINOR }}
+            type=raw,value=${{ env.VERSION_MAJOR }}
+            ## Semantic version tags
+            #type=semver,pattern={{version}}
+            #type=semver,pattern={{major}}.{{minor}}
+            #type=semver,pattern={{major}}
 
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`.
       # If the build succeeds, it pushes the image to GitHub Packages.
@@ -76,7 +95,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.TAG }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       ## not included at the moment
