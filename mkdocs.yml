@@ -6,7 +6,7 @@ repo_name: burgdev/db-backup-runner
 
 nav:
   - "Home": index.md
-  - "Getting Started": getting-started.md
+  - "Getting Started": docu.md
   - "<i>db-backup-runner</i>": cli.md
   - Packages: packages.md
   - API Reference:
@@ -85,7 +85,7 @@ theme:
 plugins:
   #  - blog
   - open-in-new-tab:
-      add_icon: false
+      add_icon: true
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - gen-files:
