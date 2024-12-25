@@ -6,7 +6,7 @@
     <em>Backup multiple database containers from one backup runner container.</em>
 </p>
 <p align="center">
-    <b><a href="https://burgdev.github.io/db-backup-runner/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
+    <b><a href="https://burgdev.github.io/db-backup-runner/getting-started/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
 </p>
 
 ---

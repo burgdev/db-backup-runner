@@ -8,8 +8,11 @@ env = Env()
 env.read_env()  # read .env file, if it exists
 
 
-def echo(*args, **kwargs):
-    rprint(*args, **kwargs)
+def echo(*args, raw=False, **kwargs):
+    if raw:
+        print(*args, **kwargs)
+    else:
+        rprint(*args, **kwargs)
 
 
 def header(

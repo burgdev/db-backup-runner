@@ -69,5 +69,5 @@ def changelog(
         sys.exit(1)
     else:
         header(f"Changelog for '{captured_version}'") if not plain else None
-        echo(content)
+        echo(content, raw=True)
         header() if not plain else None

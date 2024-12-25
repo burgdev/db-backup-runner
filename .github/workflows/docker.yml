@@ -44,22 +44,21 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
             VERSION=${{ github.event.client_payload.version }}
+            LATEST="latest"
           elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION=${{ github.ref_name }}
+            LATEST="latest"
           else
             VERSION=""
+            LATEST=""
           fi
-          if [ -n "$VERSION" ]; then
-            MAJOR=$(echo $VERSION | cut -d. -f1)
-            MINOR=$(echo $VERSION | cut -d. -f1-2)
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-            echo "VERSION_MINOR=$MAJOR.$MINOR" >> $GITHUB_ENV
-            echo "VERSION_MAJOR=$MAJOR" >> $GITHUB_ENV
-          else
-            echo "VERSION=" >> $GITHUB_ENV
-            echo "VERSION_MINOR=" >> $GITHUB_ENV
-            echo "VERSION_MAJOR=" >> $GITHUB_ENV
-          fi
+
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f1-2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION_MINOR=$MINOR" >> $GITHUB_ENV
+          echo "VERSION_MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "LATEST=$LATEST" >> $GITHUB_ENV
 
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about)
       # to extract tags and labels that will be applied to the specified image.
@@ -81,6 +80,7 @@ jobs:
             type=raw,value=${{ env.VERSION }}
             type=raw,value=${{ env.VERSION_MINOR }}
             type=raw,value=${{ env.VERSION_MAJOR }}
+            type=raw,value=${{ env.LATEST }}
             ## Semantic version tags
             #type=semver,pattern={{version}}
             #type=semver,pattern={{major}}.{{minor}}
