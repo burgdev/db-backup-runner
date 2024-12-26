@@ -4,6 +4,19 @@ version = "0.1.2"
 description = "Run any db backups (and others) from inside its own docker container"
 readme = "README.md"
 requires-python = ">=3.12"
+
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha 4 - Beta 5 - Production/Stable
+  "Development Status :: 4 - Beta",
+  # Indicate who your project is intended for
+  "Intended Audience :: Developers",
+  # Pick your license as you wish (see also "license" above)
+  "License :: OSI Approved :: MIT License",
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3.12",
+]
+
 dependencies = [
   "click>=8.1.7",
   "docker>=7.1.0",
@@ -13,6 +26,12 @@ dependencies = [
   "requests>=2.32.3",
   "tqdm>=4.67.1",
 ]
+[project.urls]
+Repository = "https://github.com/burgdev/db-backup-runner"
+Documentation = "https://burgdev.github.io/db-backup-runner/"
+Changelog = "https://github.com/burgdev/db-backup-runner/blob/main/CHANGELOG.md"
+Releases = "https://github.com/burgdev/db-backup-runner/releases"
+
 
 [tool.docker]
 registry = "ghcr.io/burgdev"
