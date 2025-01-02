@@ -1,5 +1,6 @@
 from tasks import info, error, success, header, warning, echo, env, task, Ctx, EnvError  # noqa: F401
 import toml
+import os
 from pathlib import Path
 
 
@@ -38,6 +39,7 @@ def install(c: Ctx, venv_update: bool = True):
         "add_tag": "Add the new tag and push it to remote",
         "unreleased": "Show only unreleased changes",
         "length": "Number of lines to show (mutual exclusive with unreleased)",
+        "token": "Github token",
     }
 )
 def release(
@@ -46,9 +48,15 @@ def release(
     dry: bool = False,
     unreleased: bool = True,
     length: int = -1,
+    token: str | None = None,
 ):
     """Prepare a release, update CHANGELOG file and bump versions"""
-    new_tag = c.run("git-cliff --bumped-version", hide=True).stdout.strip()
+    token = token or os.getenv("GITHUB_TOKEN")
+    if not token:
+        error("Please set 'GITHUB_TOKEN' environment variable or use --token flag.")
+    new_tag = c.run(
+        f"git-cliff --bumped-version --github-token {token}", hide=True
+    ).stdout.strip()
     new_version = new_tag.replace("v", "")
     if dry:
         unreleased = unreleased if length < 0 else False
@@ -64,7 +72,10 @@ def release(
         )
         header("Changelog start") if dry else None
         cl = (
-            c.run(f"git-cliff --bump {'--unreleased' if unreleased else ''}", hide=True)
+            c.run(
+                f"git-cliff --bump {'--unreleased' if unreleased else ''} --github-token {token}",
+                hide=True,
+            )
             .stdout.strip()
             .split("\n")
         )
