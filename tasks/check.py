@@ -42,6 +42,13 @@ def types(c: Ctx):
     c.run("uv run pyright  src", echo=True, pty=True)
 
 
+@task
+def test(c: Ctx):
+    """Static type checking"""
+    header(doc())
+    c.run("pytest -v", echo=True, pty=True)
+
+
 @task(pre=[lock, lint, deps, types], default=True)
 def check(c: Ctx):
     """Run code quality tools"""
