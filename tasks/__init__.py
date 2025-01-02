@@ -7,6 +7,7 @@ import check
 import docker
 import project
 import changelog
+import test
 
 
 @task
@@ -20,6 +21,7 @@ ns = Collection(
     project.release,
     project.version,
     project.update_venv,
+    test.test,
     check,
     docker,
     changelog.changelog,
