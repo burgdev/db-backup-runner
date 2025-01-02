@@ -134,7 +134,7 @@ class BackupManager:
             )
             if not self.global_mode:
                 logger.error(
-                    f"No containers found for project '{project_name}', use '--compose NAME' or '--global' flag."
+                    f"No containers found for project '{project_name}', use '--project NAME' or '--global' flag."
                 )
             else:
                 logger.info("You are running in '--global' mode.")

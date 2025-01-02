@@ -213,6 +213,7 @@ dev = [
     { name = "git-cliff" },
     { name = "humanize" },
     { name = "invoke" },
+    { name = "mkdocs-autoapi" },
     { name = "mkdocs-click" },
     { name = "mkdocs-gen-files" },
     { name = "mkdocs-literate-nav" },
@@ -227,6 +228,7 @@ dev = [
     { name = "rich" },
     { name = "rooster-blue" },
     { name = "ruff" },
+    { name = "termynal" },
     { name = "toml" },
     { name = "types-requests" },
 ]
@@ -251,6 +253,7 @@ dev = [
     { name = "git-cliff", specifier = ">=2.7.0" },
     { name = "humanize", specifier = ">=4.11.0" },
     { name = "invoke", specifier = ">=2.2.0" },
+    { name = "mkdocs-autoapi", specifier = ">=0.3.2" },
     { name = "mkdocs-click", specifier = ">=0.8.1" },
     { name = "mkdocs-gen-files", specifier = ">=0.5.0" },
     { name = "mkdocs-literate-nav", specifier = ">=0.6.1" },
@@ -265,6 +268,7 @@ dev = [
     { name = "rich", specifier = ">=13.9.4" },
     { name = "rooster-blue", specifier = ">=0.0.8" },
     { name = "ruff", specifier = ">=0.8.2" },
+    { name = "termynal", specifier = ">=0.12.2" },
     { name = "toml", specifier = ">=0.10.2" },
     { name = "types-requests", specifier = ">=2.32.0.20241016" },
 ]
@@ -618,6 +622,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bc/c6/bbd4f061bd16b378247f12953ffcb04786a618ce5e904b8c5a01a0309061/mkdocs-1.6.1.tar.gz", hash = "sha256:7b432f01d928c084353ab39c57282f29f92136665bdd6abf7c1ec8d822ef86f2", size = 3889159 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/22/5b/dbc6a8cddc9cfa9c4971d59fb12bb8d42e161b7e7f8cc89e49137c5b279c/mkdocs-1.6.1-py3-none-any.whl", hash = "sha256:db91759624d1647f3f34aa0c3f327dd2601beae39a366d6e064c03468d35c20e", size = 3864451 },
+]
+
+[[package]]
+name = "mkdocs-autoapi"
+version = "0.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mkdocs" },
+    { name = "mkdocstrings" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b7/02/1d53f651b4692dba8a0003a95c5373f0948e778c9563d6df56c871fd8c0a/mkdocs_autoapi-0.3.2.tar.gz", hash = "sha256:c00b88254a37ef788fa126c2578ad1dc1ac20ffd1e3edc379bd4d7335d221488", size = 21599 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/3d/804015da1985c15a8c1bfa7d67652ffa8d9628eaf401a80ab039ef4af9b5/mkdocs_autoapi-0.3.2-py3-none-any.whl", hash = "sha256:5bad09a92b9e20e43765cb007fc7f04f4473878c93b37be0d4b450a0822e65f8", size = 23984 },
 ]
 
 [[package]]
@@ -1235,6 +1252,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc", size = 20372 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2", size = 10235 },
+]
+
+[[package]]
+name = "termynal"
+version = "0.12.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markdown" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/64/2b/a0fae74a6e14f72a651e53a92c81a1edf8871a9d1de488b4814773872dce/termynal-0.12.2.tar.gz", hash = "sha256:cc2356bbf8650c16abd0558786251fabdde6b25e1125c1f091607ed3e422f7f2", size = 173890 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bc/a0/8cbeec411f2dbcf94931c9488f6a8383ebe63e39ac62d0cdc6827bcd791a/termynal-0.12.2-py3-none-any.whl", hash = "sha256:62314dac6e77f1b7b64a251c2c90702eb6e6910f72ea9c6e5ef68d715b272709", size = 10751 },
 ]
 
 [[package]]

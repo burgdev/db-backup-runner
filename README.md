@@ -6,7 +6,9 @@
     <em>Backup multiple database containers from one backup runner container.</em>
 </p>
 <p align="center">
-    <b><a href="https://burgdev.github.io/db-backup-runner/docu/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
+    <b><a href="https://burgdev.github.io/db-backup-runner/docu/">Documentation</a></b>
+    | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Docker</a></b>
+    | <b><a href="https://pypi.org/project/db-backup-runner/">PyPi</a></b>
 </p>
 
 ---
@@ -19,6 +21,14 @@ The script can also make backups from multiple containers and is configured with
 
 **NOTE:** It works best together with `docker compose`, although it should work with docker alone,
           but at the moment it is only tested with `docker compose`.
+
+
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It works best together with <code>docker compose</code>, although it should work with docker alone,
+but at the moment it is only tested with <code>docker compose</code>.</p>
+</div>
 
 For more information check out the [**documentation**](https://burgdev.github.io/db-backup-runner/docu/).
 

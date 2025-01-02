@@ -45,6 +45,7 @@ dev = [
   "git-cliff>=2.7.0",
   "humanize>=4.11.0",
   "invoke>=2.2.0",
+  "mkdocs-autoapi>=0.3.2",
   "mkdocs-click>=0.8.1",
   "mkdocs-gen-files>=0.5.0",
   "mkdocs-literate-nav>=0.6.1",
@@ -59,6 +60,7 @@ dev = [
   "rich>=13.9.4",
   "rooster-blue>=0.0.8",
   "ruff>=0.8.2",
+  "termynal>=0.12.2",
   "toml>=0.10.2",
   "types-requests>=2.32.0.20241016",
 ]

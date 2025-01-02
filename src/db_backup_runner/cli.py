@@ -1,4 +1,4 @@
-"""Command line interface, see also [cli help](/db-backup-runner/cli)."""
+"""Command line interface, see also [cli help](https://burgdev.github.io/db-backup-runner/cli/)."""
 
 from pathlib import Path
 from loguru import logger

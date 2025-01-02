@@ -10,7 +10,7 @@ The script can also make backups from multiple containers and is configured with
 
 !!! note
     It works best together with `docker compose`, although it should work with docker alone,
-    but at the moment it is only tested with `docker compose`.
+    but at the moment it is only tested with `docker compose`. For more see [packages](packages.md/#pypi).
 
 Each database which needs a backup need the `db-backup-runner.enable=true` label, as shown in the following
 docker compose configuration file:
@@ -19,7 +19,7 @@ docker compose configuration file:
 ```yaml title="Example docker compose fil with two databases and a backup runner container"
 services:
   db-backup:  # Backup container
-    image: ghcr.io/burgdev/db-backup-runner:next-alpine # (1)!
+    image: ghcr.io/burgdev/db-backup-runner:latest # (1)!
     restart: unless-stopped
     container_name: docker-db-auto-backup
     command: "backup-cron --on-startup" # optional (2)
@@ -80,7 +80,7 @@ At the moment the following providers are supported:
 - Redis (`redis-cli`)
 
 But it is easy to create additional providers and mount them into the backup container
-(`./custom:/app/src/db_backup_runner/custom`), [see `custom.provider`](reference/db_backup_runner/custom/provider#db_backup_runner.custom.provider).
+(`./custom:/app/src/db_backup_runner/custom`), see [db_backup_runner.custom.provider][].
 The custom backup providers are loaded first, this means you can overwrite existing providers (same name) or add new ones (different name).
 
 ## Command Arguments
@@ -126,15 +126,15 @@ Labels are used to control each containers backup.
 
 The default values are described in the API reference:
 
-* [Postgres](reference/db_backup_runner/provider/#db_backup_runner.provider.PostgresBackupProvider-attributes)
+* [Postgres][db_backup_runner.provider.PostgresBackupProvider-attributes]
 
 !!! warning
     Only postgres is tested at the moment, the others might not work yet!
 
 
-* [MySQL](reference/db_backup_runner/provider/#db_backup_runner.provider.MySQLBackupProvider-attributes)
-* [MariaDB](reference/db_backup_runner/provider/#db_backup_runner.provider.MariaDbBackupProvider-attributes)
-* [Redis](reference/db_backup_runner/provider/#db_backup_runner.provider.RedisBackupProvider-attributes)
+* [MySQL][db_backup_runner.provider.MySQLBackupProvider-attributes]
+* [MariaDB][db_backup_runner.provider.MariaDbBackupProvider-attributes]
+* [Redis][db_backup_runner.provider.RedisBackupProvider-attributes]
 
 
 ## Restore
@@ -146,10 +146,10 @@ helps to restore the data base.
 This gives you also the flexibility to change it accordingly to your needs.
 
 ```bash
- docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump
+ docker compose run db-backup restore ./backups/postgis/postgis.postgres.dump
  #> shows the backup commands
  # you can save it into a script
- docker compose exec db-backup db-backup-runner restore ./backups/postgis/postgis.postgres.dump restore.sh
+ docker compose run db-backup restore ./backups/postgis/postgis.postgres.dump restore.sh
  chmod +x restore.sh
  # make sure everything is correct, replace DATABASE with the correct database
  vim restore.sh
@@ -159,7 +159,7 @@ This gives you also the flexibility to change it accordingly to your needs.
 Your can create the script for just one service:
 
 ```bash
- docker compose exec db-backup db-backup-runner restore --target redis ./.../redis.redis.rdb
+ docker compose run db-backup restore --target redis ./.../redis.redis.rdb
 ```
 
 This are the main commands needed to restore a database
@@ -172,5 +172,5 @@ docker compose exec postgis pg_restore -Fc -U USER -d DATABASE /tmp/db.dump
 
 ### Host
 
-You can run the `db-backup-runner` script directly on your host.
-Install this package and use the same commands as above without `docker compose exec`
+You can run the `db-backup-runner` [script directly](packages.md/#pypi) on your host.
+Install this package and use the same commands as above without `docker compose run`
