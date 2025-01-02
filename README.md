@@ -6,7 +6,9 @@
     <em>Backup multiple database containers from one backup runner container.</em>
 </p>
 <p align="center">
-    <b><a href="https://burgdev.github.io/db-backup-runner/docu/">Documentation</a></b> | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Packages</a></b>
+    <b><a href="https://burgdev.github.io/db-backup-runner/docu/">Documentation</a></b>
+    | <b><a href="https://ghcr.io/burgdev/db-backup-runner">Docker</a></b>
+    | <b><a href="https://pypi.org/project/db-backup-runner/">PyPi</a></b>
 </p>
 
 ---
@@ -16,9 +18,6 @@ Since it uses the backup tool (e.g. `pgdump`) from inside the database container
 easy to add support for many databases.
 
 The script can also make backups from multiple containers and is configured with _labels_ (in docker compose).
-
-**NOTE:** It works best together with `docker compose`, although it should work with docker alone,
-          but at the moment it is only tested with `docker compose`.
 
 For more information check out the [**documentation**](https://burgdev.github.io/db-backup-runner/docu/).
 

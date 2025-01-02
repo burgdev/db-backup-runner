@@ -93,6 +93,10 @@ plugins:
         - tasks/gen_ref_pages.py
   - literate-nav
   - section-index
+  - termynal
+  #- mkdocs-autoapi: # does not work?
+  #    autoapi_dir: src
+  #    autoapi_keep_files: True
   - mkdocstrings:
       handlers:
         python:
@@ -157,14 +161,27 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.highlight
+        #- pymdownx.highlight
+        #- pymdownx.inlinehilite
+
+
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      use_pygments: true
   - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.superfences
+  #- pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
