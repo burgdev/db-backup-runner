@@ -43,7 +43,7 @@ def _compression_option():
         "-c",
         "--compression",
         help="Compression algorithm.",
-        envvar="COMPRESSION",
+        envvar="DB_BACKUP_COMPRESSION",
         type=click.Choice(compression_algorithms),
         show_default=True,
         show_envvar=True,
@@ -56,7 +56,7 @@ def _backup_dir_option():
         "-b",
         "--backup-dir",
         help="Backup directory.",
-        envvar="BACKUP_DIR",
+        envvar="DB_BACKUP_DIR",
         show_default=True,
         show_envvar=True,
         default=DEFAULT_BACKUP_DIR,
@@ -68,7 +68,7 @@ def _use_timestamp_option():
         "-t",
         "--use-timestamp",
         help="Add a timestamp to the backup filename.",
-        envvar="USE_TIMESTAMP",
+        envvar="DB_BACKUP_USE_TIMESTAMP",
         show_envvar=True,
         is_flag=True,
         show_default=True,
@@ -81,7 +81,7 @@ def _webhook_option():
         "--webhook",
         "webhook_url",
         help="Heartbeat webhook address.",
-        envvar="WEBHOOK",
+        envvar="DB_BACKUP_WEBHOOK",
         show_envvar=True,
         default="",
     )
@@ -128,7 +128,7 @@ def _global_option():
     "--on-startup",
     is_flag=True,
     help="Run backup on startup as well.",
-    envvar="ON_STARTUP",
+    envvar="DB_BACKUP_ON_STARTUP",
     show_envvar=True,
     type=bool,
 )
@@ -172,7 +172,7 @@ def backup(backup_dir, **kwargs):
     "--target",
     metavar="CONTAINER|SERVICE",
     help="Optional target which is either a container id, name or service name.",
-    envvar="DB_TARGET",
+    envvar="DB_BACKUP_TARGET",
 )
 @click.argument(
     "restore_file",  # type=click.Path(exists=True)

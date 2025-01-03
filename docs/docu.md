@@ -25,7 +25,7 @@ services:
     command: "backup-cron --on-startup" # optional (2)
     environment:
       DB_BACKUP_CRON: "0 4 * * *" # (3)!
-      WEBHOOK: "https://my-webhook.io/myapp"
+      DB_BACKUP_WEBHOOK: "https://my-webhook.io/myapp"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro" # required
       - ./backups:/tmp/db_backup_runner # required, backup directory
