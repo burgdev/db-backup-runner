@@ -14,7 +14,7 @@ conventional_commits = false
 filter_unconventional = false
 #topo_order = true
 commit_parsers = [
-  { field = "github.pr_labels", pattern = "type.internal", skip = true },
+  { field = "github.pr_labels", pattern = "type:internal", skip = true },
   { field = "github.pr_labels", pattern = "release:breaking", group = "<!-- 00 -->🏗️ Breaking changes" },
   { field = "github.pr_labels", pattern = "type:feature", group = "<!-- 10 -->🚀 Features" },
   { field = "github.pr_labels", pattern = "type:bug", group = "<!-- 20 -->🐛 Fixes" },
@@ -23,7 +23,7 @@ commit_parsers = [
   { field = "github.pr_labels", pattern = "type:update", group = "<!-- 50 -->🧪 Dependencies" },
   { field = "github.pr_labels", pattern = "type:others", group = "<!-- 60 -->🌀 Miscellaneous" },
   { field = "github.pr_labels", pattern = "type:chore", group = "<!-- 60 -->🌀 Miscellaneous", default_scope = "Tooling" },
-  #{ field = "github.pr_labels", pattern = ".*", skip = true },
+  { field = "github.pr_labels", pattern = ".*", skip = true },
 ]
 
 # remove last added merged requests, they are added below again (with url).
