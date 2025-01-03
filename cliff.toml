@@ -60,26 +60,23 @@ body = """
             {%- endif -%}
     {% endfor %}
 {% endfor %}
+{% if version -%}
+    {% if previous.version -%}
+        [{{ version | trim_start_matches(pat="v") }}]: \
+            {{ self::remote_url() }}/compare/{{ previous.version }}..{{ version }}
+    {% else -%}
+        [{{ version | trim_start_matches(pat="v") }}]: \
+            {{ self::remote_url() }}/releases/tag/{{ version }}
+    {% endif -%}
+{% else -%}
+    [unreleased]: {{ self::remote_url() }}/compare/{{ previous.version }}..HEAD
+{% endif -%}
 {# #}\n
 """
 footer = """
 {%- macro remote_url() -%}
   https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
 {%- endmacro -%}
-
-{% for release in releases -%}
-    {% if release.version -%}
-        {% if release.previous.version -%}
-            [{{ release.version | trim_start_matches(pat="v") }}]: \
-
-                {{ self::remote_url() }}/compare/{{ release.previous.version }}..{{ release.version }}
-        {% endif -%}
-    {% else -%}
-        [unreleased]: {{ self::remote_url() }}/compare/{{ release.previous.version }}..HEAD
-    {% endif -%}
-{% endfor %}
-[0.1.1]: {{ self::remote_url() }}/releases/tag/v0.1.1
-
 """
 # remove the leading and trailing whitespace from the templates
 trim = true

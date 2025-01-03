@@ -1,6 +1,5 @@
 from tasks import info, error, success, header, warning, echo, env, task, Ctx, EnvError  # noqa: F401
 import toml
-import os
 from pathlib import Path
 
 
@@ -39,7 +38,6 @@ def install(c: Ctx, venv_update: bool = True):
         "add_tag": "Add the new tag and push it to remote",
         "unreleased": "Show only unreleased changes",
         "length": "Number of lines to show (mutual exclusive with unreleased)",
-        "token": "Github token",
     }
 )
 def release(
@@ -48,15 +46,9 @@ def release(
     dry: bool = False,
     unreleased: bool = True,
     length: int = -1,
-    token: str | None = None,
 ):
     """Prepare a release, update CHANGELOG file and bump versions"""
-    token = token or os.getenv("GITHUB_TOKEN")
-    if not token:
-        error("Please set 'GITHUB_TOKEN' environment variable or use --token flag.")
-    new_tag = c.run(
-        f"git-cliff --bumped-version --github-token {token}", hide=True
-    ).stdout.strip()
+    new_tag = c.run("git-cliff --bumped-version", hide=True).stdout.strip()
     new_version = new_tag.replace("v", "")
     if dry:
         unreleased = unreleased if length < 0 else False
@@ -73,7 +65,7 @@ def release(
         header("Changelog start") if dry else None
         cl = (
             c.run(
-                f"git-cliff --bump {'--unreleased' if unreleased else ''} --github-token {token}",
+                f"git-cliff --bump {'--unreleased' if unreleased else ''}",
                 hide=True,
             )
             .stdout.strip()
@@ -85,13 +77,18 @@ def release(
             echo(f"{"\n".join(cl[:length])}\n...\n")
         header("Changelog end") if dry else None
     else:
-        cl = c.run("git-cliff --bump -o", hide=True).stdout.strip().split("\n")
+        cl = (
+            c.run("git-cliff --bump -u --prepend CHANGELOG.md", hide=True)
+            .stdout.strip()
+            .split("\n")
+        )
         c.run(f"bump2version --new-version {new_version} patch")
 
         # only prepend new tag -- this way it is possible to edit it.
         # cl = c.run(f"git-cliff --bump {'--prepend CHANGELOG.md' if dry else '-o'}", hide=True).stdout.strip().split("\n")
     if new_tag:
         success(f"Bumped to version '{new_version}' (tag '{new_tag}').")
+        info("Please check the entries in 'CHANGELOG.md' and update it accordingly.")
         if add_tag and not dry:
             c.run(f"git tag -f '{new_tag}'")
             c.run(f"git push origin '{new_tag}'")
