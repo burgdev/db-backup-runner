@@ -7,7 +7,7 @@ from tasks import (
 
 
 @task
-def test(c: Ctx):
+def run(c: Ctx):
     """Run tests"""
     header(doc())
     c.run("pytest -v", echo=True, pty=True)

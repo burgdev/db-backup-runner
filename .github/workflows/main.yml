@@ -21,7 +21,7 @@ jobs:
         run: uv run inv check
 
       - name: Run test
-        run: uv run inv test
+        run: uv run inv tests.run
 
   check-docs:
     runs-on: ubuntu-latest
