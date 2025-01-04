@@ -19,6 +19,8 @@ extra:
       link: https://github.com/burgdev/db-backup-runner
     - icon: fontawesome/brands/docker
       link: https://ghcr.io/burgdev/db-backup-runner
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/db-backup-runner/
 
 theme:
   name: material

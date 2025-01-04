@@ -3,11 +3,12 @@ from invoke.context import Context as Ctx
 from invoke.tasks import task
 from _logger import info, error, success, warning, echo, doc, header
 from _env import env, EnvError
-import check
-import docker
-import project
-import changelog
-import test
+import tasks.check as check
+import tasks.docker as docker
+import tasks.project as project
+import tasks.changelog as changelog
+import tasks.tests as tests
+import tasks.docs as docs
 
 
 @task
@@ -21,7 +22,8 @@ ns = Collection(
     project.release,
     project.version,
     project.update_venv,
-    test.test,
+    docs,
+    tests,
     check,
     docker,
     changelog.changelog,
