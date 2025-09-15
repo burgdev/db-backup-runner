@@ -87,7 +87,7 @@ theme:
 plugins:
   #  - blog
   - open-in-new-tab:
-      add_icon: true
+      add_icon: false
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - gen-files:
