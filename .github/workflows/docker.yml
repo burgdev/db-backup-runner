@@ -73,6 +73,7 @@ jobs:
             # Add 'edge' tag for main and develop branches
             type=edge,pattern=main
             type=edge,pattern=develop
+            type=sha # create a sha tag
             # Use a custom tag if manually dispatched
             type=raw,value=${{ github.event.inputs.custom_tag || '' }}
 
