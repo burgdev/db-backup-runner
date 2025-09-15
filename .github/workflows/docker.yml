@@ -21,6 +21,25 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.labelcheck.outputs.skip }}
+    steps:
+      - name: Get PR for commit
+        id: pr
+        uses: actions-ecosystem/action-get-latest-pr@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check labels
+        id: labelcheck
+        run: |
+          if echo "${{ steps.pr.outputs.labels }}" | grep -q "NO_DOCKER"; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
   build-and-push-image:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
@@ -29,12 +48,8 @@ jobs:
       packages: write
       attestations: write
       id-token: write
-      pull-requests: read
-    if: >
-      !(
-        github.event_name == 'push' &&
-        contains(steps.pr.outputs.labels, 'NO_DOCKER')
-      )
+    needs: check-label
+    if: needs.check-label.outputs.skip != 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
