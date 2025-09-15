@@ -29,6 +29,12 @@ jobs:
       packages: write
       attestations: write
       id-token: write
+      pull-requests: read
+    if: >
+      !(
+        github.event_name == 'push' &&
+        contains(steps.pr.outputs.labels, 'NO_DOCKER')
+      )
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
