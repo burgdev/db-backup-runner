@@ -5,6 +5,7 @@
 - `latest`: latest stable version
 - `major`, `major.minor` and `major.minor.rev` tags
 - `edge`: unstable development version
+- `sha-HASH`: git hash of the commit
 
 
 === "Docker Compose"
