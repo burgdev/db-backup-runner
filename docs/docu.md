@@ -116,6 +116,18 @@ Labels are used to control each containers backup.
 `db-backup-runner.dump_args = <additional args>`
 :   Additional arguments for the `dump` command.
 
+`db-backup-runner.user = <user>`
+:   Database user for, default from `env` variables.
+
+`db-backup-runner.database = <database>`
+:   Database name for, default from `env` variables.
+
+`db-backup-runner.restore_binary = <custom binary name or path>`
+:   If the default command doesn't work.
+
+`db-backup-runner.restore_args = <additional args>`
+:   Additional arguments for the `restore` command.
+
 `db-backup-runner.min_file_size = <number>`
 :   A sanity check is done for the file size, this can be changed per container (default: 200)
 
