@@ -27,19 +27,22 @@ jobs:
       skip: ${{ steps.labelcheck.outputs.skip }}
     steps:
       - name: Get PR for commit
-        id: pr
-        uses: actions-ecosystem/action-get-latest-pr@v1
+        id: get_pr
+        uses: actions-ecosystem/action-get-merged-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check labels
         id: labelcheck
         run: |
-          if echo "${{ steps.pr.outputs.labels }}" | grep -q "NO_DOCKER"; then
+          LABELS="${{ steps.get_pr.outputs.labels }}"
+          echo "Labels: $LABELS"
+          if echo "$LABELS" | grep -q "NO_DOCKER"; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+
   build-and-push-image:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
